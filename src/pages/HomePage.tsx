@@ -3,6 +3,7 @@ import EmployeesPage from "./employees/EmployeesPage.tsx";
 import PlaysPage from "./plays/PlaysPage.tsx";
 import "../HomePage.css"
 import PerformancesPage from "./performances/PerformancesPage.tsx";
+import AuthorsPage from "./authors/AuthorsPage.tsx";
 
 export default function HomeApp() {
     return (
@@ -12,7 +13,7 @@ export default function HomeApp() {
                 <Route path="plays" element={<PlaysPage/>}/>
                 <Route path="performances" element={<PerformancesPage/>}/>
                 <Route path="actors" element={<PlaysPage/>}/>
-                <Route path="authors" element={<PlaysPage/>}/>
+                <Route path="authors" element={<AuthorsPage/>}/>
                 <Route path="incomes" element={<PlaysPage/>}/>
                 <Route path="tickets" element={<PlaysPage/>}/>
                 <Route path="castings" element={<PlaysPage/>}/>

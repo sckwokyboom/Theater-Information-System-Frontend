@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {Button, DatePicker, Popover} from 'antd';
 import '../../Filter.css';
-import {FilterPerformanceCriteria, FilterPerformanceProps} from "../../webclient/Performance.ts";
-import {Repertoire} from "../../webclient/Repertoire.ts";
-import {Genre} from "../../webclient/Genre.ts";
-import {Author} from "../../webclient/Author.ts";
-import {Country} from "../../webclient/Country.ts";
+import {Repertoire} from "../../webclients/repertoire/Repertoire.ts";
+import {Genre} from "../../webclients/genre/Genre.ts";
+import {Author} from "../../webclients/author/Author.ts";
+import {Country} from "../../webclients/country/Country.ts";
+import {FilterPerformanceCriteria} from "../../webclients/performance/FilterPerformanceCriteria.ts";
+import {FilterProps} from "../../FilterProps.ts";
 
-const Filter: React.FC<FilterPerformanceProps> = ({onFilterChange}) => {
+const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterPerformanceCriteria>({
         repertoireId: undefined,
         isPremiere: undefined,

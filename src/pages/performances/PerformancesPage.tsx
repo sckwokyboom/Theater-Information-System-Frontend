@@ -1,24 +1,11 @@
 import '../../App.css'
-import {constructPerformanceQuery, FilterPerformanceCriteria, Performance} from '../../webclient/Performance.ts'
-import {useEffect, useState} from "react";
-import Filter from "./FilterPerformancesForm.tsx";
+import {Performance} from '../../webclients/performance/Performance.ts'
+import {useState} from "react";
 import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
-import {DatePicker} from "antd";
+import DatePicker from "react-datepicker";
 
 function PerformancesPage() {
-    const handleFilterChange = (filters: FilterPerformanceCriteria) => {
-        setCurrentRequest(constructPerformanceQuery(
-            filters.repertoireId,
-            filters.isPremiere,
-            filters.genreId,
-            filters.dateOfStart,
-            filters.dateOfEnd,
-            filters.authorId,
-            filters.authorCountryId,
-            filters.centuryOfPlayWriting))
-    };
-    const [currentRequest, setCurrentRequest] = useState('http://localhost:8080/performances/filter');
     const [performances, setPerformances] = useState<Performance[]>([]);
     const [editingPerformanceIndex, setEditingPerformanceIndex] = useState<number | null>(null);
     const [editedPerformance, setEditedPerformance] = useState<Performance | null>(null);
@@ -56,28 +43,10 @@ function PerformancesPage() {
         }
     };
 
-
-    useEffect(() => {
-        const fetchPerformances = async () => {
-            try {
-                const response = await fetch(currentRequest);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setPerformances(data);
-                console.log(performances)
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error);
-            }
-        };
-
-        fetchPerformances();
-    }, [currentRequest]);
-
     return (
+        // <FilteredTable fetchData={} filterInitialState={} renderRow={} FilterComponent={} tableHeaders={}
         <div className="table-and-filter-container">
-            <Filter onFilterChange={handleFilterChange}/>
+            {/*<Filter onFilterChange={handleFilterChange}/>*/}
             <div className="table-container">
                 <table className="table">
                     <thead className="thead-dark">

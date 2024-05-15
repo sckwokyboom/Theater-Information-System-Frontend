@@ -1,187 +1,186 @@
 import '../../App.css'
-import {useEffect, useState} from "react";
-import Filter, {FilterAuthorCriteria} from "./FilterEmployeesForm.tsx";
-import axios from "axios";
-import DatePicker from "react-datepicker";
+import React, {useEffect, useState} from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import {constructAuthorQuery} from "../../webclient/Author.ts";
+import {Author} from "../../webclients/author/Author.ts";
+import {AuthorClient} from "../../webclients/author/AuthorClient.ts";
+import {FilterAuthorCriteria} from "../../webclients/author/FilterAuthorCriteria.ts";
+import FilteredTable from "../FilteredTable.tsx";
+import FilterAuthorsForm from "./FilterAuthorsForm.tsx";
+import {Country} from "../../webclients/country/Country.ts";
+import {CountryClient} from "../../webclients/country/CountryClient.ts";
+import {Genre} from "../../webclients/genre/Genre.ts";
 
-class Author {
-    id: number;
-    firstName: string;
-    secondName: string | undefined;
-    patronymic: string | undefined;
-    dateOfBirth: string | undefined;
-    dateOfDeath: string | undefined;
-    countryOfOriginName: string;
 
-    constructor(id: number, firstName: string, secondName: string, countryOfOriginName: string, dateOfBirth: string, patronymic: string, dateOfDeath: string) {
-        this.id = id;
-        this.firstName = firstName;
-        this.secondName = secondName;
-        this.patronymic = patronymic;
-        this.dateOfBirth = dateOfBirth;
-        this.dateOfDeath = dateOfDeath
-        this.countryOfOriginName = countryOfOriginName;
+function AuthorsPage() {
+    const authorClient = new AuthorClient()
+    const fetchData = async (filters: FilterAuthorCriteria): Promise<Author[]> => {
+        try {
+            const data = await authorClient.fetchData("authors/filter", filters)
+            if (data) {
+                setAuthors(data)
+                return data
+            }
+            return []
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return []
+        }
     }
-}
-
-function EmployeesPage() {
-    const handleFilterChange = (filters: FilterAuthorCriteria) => {
-        setCurrentRequest(constructAuthorQuery(filters.wasPerformed, filters.centuryOfLiving, filters.countryOfOriginId, filters.genreId, filters.dateOfStartPerformanceAuthorsPlays, filters.dateOfEndPerformanceAuthorsPlays))
-    };
-    const [currentRequest, setCurrentRequest] = useState('http://localhost:8080/employees/filter');
-    const [employees, setEmployees] = useState<Author[]>([]);
-    const [editingEmployeeIndex, setEditingEmployeeIndex] = useState<number | null>(null);
-    const [editedEmployee, setEditedEmployee] = useState<Author | null>(null);
-
+    const [authors, setAuthors] = useState<Author[]>([]);
+    const [editingAuthorIndex, setEditingAuthorIndex] = useState<number | null>(null);
+    const [editedAuthor, setEditedAuthor] = useState<Author | null>(null);
+    const [countriesOptions, setCountriesOptions] = useState<Country[]>([])
 
     const toggleEditMode = (index: number) => {
-        setEditingEmployeeIndex(index);
-        setEditedEmployee({...employees[index]});
+        setEditingAuthorIndex(index);
+        setEditedAuthor({...authors[index]});
     };
-
 
     const handleUpdateEmployee = async () => {
         try {
-            if (editedEmployee) {
-                await axios.put(`http://localhost:8080/employees/${editedEmployee.id}`, editedEmployee);
-                const updatedEmployees = [...employees];
-                updatedEmployees[editingEmployeeIndex!] = editedEmployee;
-                setEmployees(updatedEmployees);
-                setEditingEmployeeIndex(null);
-                setEditedEmployee(null);
+            if (editedAuthor) {
+                const updatedAuthor = await authorClient.updateData("authors", editedAuthor.id, editedAuthor)
+                if (updatedAuthor) {
+                    const updatedAuthors = [...authors];
+                    updatedAuthors[editingAuthorIndex!] = editedAuthor;
+                    setAuthors(updatedAuthors);
+                    setEditingAuthorIndex(null);
+                    setEditedAuthor(null);
+                }
             }
         } catch (error) {
             console.error('Error updating employee:', error);
         }
     };
 
-    const handleDeleteEmployee = async (employeeId: number) => {
+    const handleDeleteAuthor = async (authorId: number) => {
         try {
-            await axios.delete(`http://localhost:8080/employees/${employeeId}`);
-            setEmployees(employees.filter(employee => employee.id !== employeeId));
-            setEditingEmployeeIndex(null);
-            setEditedEmployee(null);
+            const deleted = await authorClient.deleteData("authors", authorId)
+            if (deleted) {
+                setAuthors(authors.filter(author => author.id !== authorId));
+                setEditingAuthorIndex(null);
+                setEditedAuthor(null);
+            }
         } catch (error) {
-            console.error('Error deleting employee:', error);
+            console.error('Error deleting author:', error);
         }
     };
 
-
     useEffect(() => {
-        const fetchEmployees = async () => {
+        const fetchCountriesOptions = async () => {
+            const countriesClient = CountryClient.getInstance()
             try {
-                const response = await fetch(currentRequest);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                const countries = await countriesClient.fetchAllCountries()
+                if (countries) {
+                    setCountriesOptions(countries);
                 }
-                const data = await response.json();
-                setEmployees(data);
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         };
+        fetchCountriesOptions().then()
+    }, []);
 
-        fetchEmployees();
-    }, [currentRequest]);
+    const renderRow = (author: Author, index: number) => (
+        <tr key={author.id}
+            onClick={() => {
+                if (index !== editingAuthorIndex) {
+                    toggleEditMode(index);
+                }
+            }}>
+            <td>{author.id}</td>
+            <td>{editingAuthorIndex === index ? (
+                <input type="text"
+                       value={editedAuthor?.firstName || ""}
+                       onChange={(e) => setEditedAuthor({
+                           ...editedAuthor!,
+                           firstName: e.target.value
+                       })}/>
+            ) : author.firstName}</td>
+
+            <td>{editingAuthorIndex === index ? (
+                <input type="text" value={editedAuthor?.secondName || ""}
+                       onChange={(e) => setEditedAuthor({
+                           ...editedAuthor!,
+                           secondName: e.target.value
+                       })}/>
+            ) : author.secondName}</td>
+
+            <td>{editingAuthorIndex === index ? (
+                <input type="text" value={editedAuthor?.patronymic || ""}
+                       onChange={(e) => setEditedAuthor({
+                           ...editedAuthor!,
+                           patronymic: e.target.value
+                       })}/>
+            ) : author.patronymic}</td>
+
+
+            <td>{editingAuthorIndex === index ? (
+                <DatePicker selected={editedAuthor?.dateOfBirth}
+                            onChange={(date: Date) => setEditedAuthor({
+                                ...editedAuthor!,
+                                dateOfBirth: date.toISOString()
+                            })}/>
+            ) : author.dateOfBirth}</td>
+
+            <td>{editingAuthorIndex === index ? (
+                <DatePicker selected={editedAuthor?.dateOfDeath}
+                            onChange={(date: Date) => setEditedAuthor({
+                                ...editedAuthor!,
+                                dateOfDeath: date.toISOString()
+                            })}/>
+            ) : author.dateOfDeath}</td>
+
+            <td>{editingAuthorIndex === index ? (
+                <select
+                    name="countryOfOriginName"
+                    value={author.countryOfOriginName}
+                    onChange={(event) => {
+                        setEditedAuthor({
+                            ...editedAuthor!,
+                            countryOfOriginName: event.target.value
+                        })
+                    }}
+                    className="form-input">
+                    {countriesOptions.map(country => (
+                        <option key={country.id} value={country.id}>
+                            {country.name}
+                        </option>
+                    ))}
+                </select>
+            ) : author.countryOfOriginName}</td>
+
+            {editingAuthorIndex === index && (
+                <td>
+                    <button onClick={handleUpdateEmployee}>Save Changes</button>
+                </td>
+            )}
+            {editingAuthorIndex === index && (
+                <td>
+                    <button onClick={() => handleDeleteAuthor(author.id)}>Delete employee
+                    </button>
+                </td>
+            )}
+        </tr>
+    );
 
     return (
-        <div className="table-and-filter-container">
-            <Filter onFilterChange={handleFilterChange}/>
-            <div className="table-container">
-                <table className="table">
-                    <thead className="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Имя</th>
-                        <th>Фамилия</th>
-                        <th>Пол</th>
-                        <th>Дата рождения</th>
-                        <th>Дата найма</th>
-                        <th>Зарплата</th>
-                        <th>Количество детей</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {employees.map((employee, index) => (
-                        <tr key={employee.id}
-                            onClick={() => {
-                                if (index != editingEmployeeIndex) {
-                                    toggleEditMode(index)
-                                }
-                            }}>
-                            <td>{employee.id}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <input type="text" value={editedEmployee?.firstName || ""}
-                                       onChange={(e) => setEditedEmployee({
-                                           ...editedEmployee!,
-                                           firstName: e.target.value
-                                       })}/>
-                            ) : employee.firstName}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <input type="text" value={editedEmployee?.secondName || ""}
-                                       onChange={(e) => setEditedEmployee({
-                                           ...editedEmployee!,
-                                           secondName: e.target.value
-                                       })}/>
-                            ) : employee.secondName}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <select value={editedEmployee?.countryOfOriginName || ""}
-                                        onChange={(e) => setEditedEmployee({
-                                            ...editedEmployee!,
-                                            countryOfOriginName: e.target.value
-                                        })}>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            ) : employee.countryOfOriginName}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <DatePicker selected={editedEmployee?.dateOfBirth}
-                                            onChange={(date: Date) => setEditedEmployee({
-                                                ...editedEmployee!,
-                                                dateOfBirth: date.toISOString()
-                                            })}/>
-                            ) : employee.dateOfBirth}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <DatePicker selected={editedEmployee?.patronymic}
-                                            onChange={(date: Date) => setEditedEmployee({
-                                                ...editedEmployee!,
-                                                patronymic: date.toISOString()
-                                            })}/>
-                            ) : employee.patronymic}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <input type="number" value={editedEmployee?.salary || 0}
-                                       onChange={(e) => setEditedEmployee({
-                                           ...editedEmployee!,
-                                           salary: parseInt(e.target.value)
-                                       })}/>
-                            ) : employee.salary}</td>
-                            <td>{editingEmployeeIndex === index ? (
-                                <input type="number" value={editedEmployee?.amountOfChildren || 0}
-                                       onChange={(e) => setEditedEmployee({
-                                           ...editedEmployee!,
-                                           amountOfChildren: parseInt(e.target.value)
-                                       })}/>
-                            ) : employee.amountOfChildren}</td>
-                            {editingEmployeeIndex === index && (
-                                <td>
-                                    <button onClick={handleUpdateEmployee}>Save Changes</button>
-                                </td>
-                            )}
-                            {editingEmployeeIndex === index && (
-                                <td>
-                                    <button onClick={() => handleDeleteEmployee(employee.id)}>Delete employee
-                                    </button>
-                                </td>
-                            )}
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <FilteredTable<Author, FilterAuthorCriteria>
+            fetchData={fetchData}
+            filterInitialState={{
+                wasPerformed: undefined,
+                centuryOfLiving: undefined,
+                countryOfOriginId: undefined,
+                genreId: undefined,
+                dateOfStartPerformanceAuthorsPlays: undefined,
+                dateOfEndPerformanceAuthorsPlays: undefined
+            }}
+            renderRow={renderRow}
+            FilterComponent={FilterAuthorsForm}
+            tableHeaders={["ID", "Имя", "Фамилия", "Отчество", "Дата рождения", "Дата смерти", "Страна происхождения"]}
+            tableData={authors}
+        />
     )
 }
 
-export default EmployeesPage
+export default AuthorsPage

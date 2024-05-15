@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
 import '../../Filter.css';
+import {FilterProps} from "../../FilterProps.ts";
+import {FilterEmployeeCriteria} from "../../webclients/employee/FilterEmployeeCriteria.ts";
 
-const Filter: React.FC<FilterEmployeeProps> = ({onFilterChange}) => {
+const FilterEmployeesForm: React.FC<FilterProps<FilterEmployeeCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterEmployeeCriteria>({
         minSalary: undefined,
         maxSalary: undefined,
         gender: '',
-        childrenCount: undefined,
-        employeeType: '',
+        amountOfChildren: undefined,
+        employeeTypeName: '',
     });
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -18,11 +20,11 @@ const Filter: React.FC<FilterEmployeeProps> = ({onFilterChange}) => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         onFilterChange(filters);
+        console.log("SUBMIT")
         console.log(filters)
     };
 
     const employeeTypeOptions = ['Все работники', 'Артисты', 'Музыканты', 'Актёры', 'Постановщики', 'Режиссёры-постановщики', 'Дирижёры', 'Художники-постановщики', 'Менеджеры'];
-    // const genderTypes = ['Мужчины', 'Женщины', 'Другое']
 
     const [selectedEmployeeTypeOption, setSelectedEmployeeTypeOption] = useState('');
     const handleSelectEmployeeTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -98,15 +100,15 @@ const Filter: React.FC<FilterEmployeeProps> = ({onFilterChange}) => {
             <label className="form-label">
                 Количество детей:
                 <input type="number"
-                       name="childrenCount"
-                       value={filters.childrenCount}
+                       name="amountOfChildren"
+                       value={filters.amountOfChildren}
                        onChange={handleInputChange}
                        className="form-input"/>
             </label>
 
             <label className="form-label">
                 Тип сотрудника:
-                <select name="employeeType" value={selectedEmployeeTypeOption}
+                <select name="employeeTypeName" value={selectedEmployeeTypeOption}
                         onChange={handleSelectEmployeeTypeChange}
                         className="form-select">
                     {employeeTypeOptions.map((option, index) => (
@@ -119,4 +121,4 @@ const Filter: React.FC<FilterEmployeeProps> = ({onFilterChange}) => {
     );
 };
 
-export default Filter;
+export default FilterEmployeesForm;
