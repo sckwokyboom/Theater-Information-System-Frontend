@@ -25,8 +25,8 @@ const FilterEmployeesForm: React.FC<FilterProps<FilterEmployeeCriteria>> = ({onF
     };
 
     const employeeTypeOptions = ['Все работники', 'Артисты', 'Музыканты', 'Актёры', 'Постановщики', 'Режиссёры-постановщики', 'Дирижёры', 'Художники-постановщики', 'Менеджеры'];
-
     const [selectedEmployeeTypeOption, setSelectedEmployeeTypeOption] = useState('');
+
     const handleSelectEmployeeTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const {name, value} = event.target;
         setSelectedEmployeeTypeOption(value)

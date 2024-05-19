@@ -105,26 +105,26 @@ const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilte
             </label>
 
 
-            <label className="form-label">
-                Век, в котором жил автор:
-                <input type="number"
-                       name="centuryOfLiving"
-                       value={filters.centuryOfLiving}
-                       onChange={handleInputChange}
-                       className="form-input"/>
-            </label>
+            {/*<label className="form-label">*/}
+            {/*    Век, в котором жил автор:*/}
+            {/*    <input type="number"*/}
+            {/*           name="centuryOfLiving"*/}
+            {/*           value={filters.centuryOfLiving}*/}
+            {/*           onChange={handleInputChange}*/}
+            {/*           className="form-input"/>*/}
+            {/*</label>*/}
 
-            <label className="form-label">
-                Ставился ли спектакль по пьесам автора:
-                <select name="wasPerformed"
-                        value={filters.wasPerformed}
-                        onChange={handleInputChange}
-                        className="form-select">
-                    <option value=""></option>
-                    <option value="true">Да</option>
-                    <option value="false">Нет</option>
-                </select>
-            </label>
+            {/*<label className="form-label">*/}
+            {/*    Ставился ли спектакль по пьесам автора:*/}
+            {/*    <select name="wasPerformed"*/}
+            {/*            value={filters.wasPerformed}*/}
+            {/*            onChange={handleInputChange}*/}
+            {/*            className="form-select">*/}
+            {/*        <option value=""></option>*/}
+            {/*        <option value="true">Да</option>*/}
+            {/*        <option value="false">Нет</option>*/}
+            {/*    </select>*/}
+            {/*</label>*/}
 
             <label className="form-label">
                 Жанр, в котором автор писал пьесы:

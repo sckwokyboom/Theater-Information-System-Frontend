@@ -4,6 +4,7 @@ import PlaysPage from "./plays/PlaysPage.tsx";
 import "../HomePage.css"
 import PerformancesPage from "./performances/PerformancesPage.tsx";
 import AuthorsPage from "./authors/AuthorsPage.tsx";
+import CastingsPage from "./castings/CastingsPage.tsx";
 
 export default function HomeApp() {
     return (
@@ -11,12 +12,12 @@ export default function HomeApp() {
             <Route path="/" element={<Layout/>}>
                 <Route path="employees" element={<EmployeesPage/>}/>
                 <Route path="plays" element={<PlaysPage/>}/>
-                <Route path="performances" element={<PerformancesPage/>}/>
+                {/*<Route path="performances" element={<PerformancesPage/>}/>*/}
                 <Route path="actors" element={<PlaysPage/>}/>
                 <Route path="authors" element={<AuthorsPage/>}/>
                 <Route path="incomes" element={<PlaysPage/>}/>
                 <Route path="tickets" element={<PlaysPage/>}/>
-                <Route path="castings" element={<PlaysPage/>}/>
+                <Route path="castings" element={<CastingsPage/>}/>
                 <Route path="roles" element={<PlaysPage/>}/>
             </Route>
             {/*<Route path="*" element={<NoMatch />} />*/}
@@ -40,27 +41,27 @@ function Layout() {
                         <li>
                             <Link to="/plays">Пьесы</Link>
                         </li>
-                        <li>
-                            <Link to="/performances">Спектакли</Link>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <Link to="/performances">Спектакли</Link>*/}
+                        {/*</li>*/}
                         <li>
                             <Link to="/authors">Авторы</Link>
                         </li>
-                        <li>
-                            <Link to="/actors">Актёры</Link>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <Link to="/actors">Актёры</Link>*/}
+                        {/*</li>*/}
                         <li>
                             <Link to="/castings">Кастинги</Link>
                         </li>
-                        <li>
-                            <Link to="/roles">Роли</Link>
-                        </li>
-                        <li>
-                            <Link to="/incomes">Доходы</Link>
-                        </li>
-                        <li>
-                            <Link to="/tickets">Свободные места</Link>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <Link to="/roles">Роли</Link>*/}
+                        {/*</li>*/}
+                        {/*<li>*/}
+                        {/*    <Link to="/incomes">Доходы</Link>*/}
+                        {/*</li>*/}
+                        {/*<li>*/}
+                        {/*    <Link to="/tickets">Свободные места</Link>*/}
+                        {/*</li>*/}
                         {/*    <li>*/}
                         {/*        /!* Use a normal <a> when linking to the "Inbox" app so the browser*/}
                         {/*does a full document reload, which is what we want when exiting*/}

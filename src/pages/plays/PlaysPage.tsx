@@ -20,7 +20,7 @@ function PlaysPage() {
     useEffect(() => {
         const fetchPlays = async () => {
             try {
-                const response = await fetch('http://localhost:8080/plays/all');
+                const response = await fetch('http://localhost:8080/plays');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

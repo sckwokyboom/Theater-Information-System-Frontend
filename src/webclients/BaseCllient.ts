@@ -37,4 +37,13 @@ export abstract class BaseClient<T, Filter> {
             console.error('Error deleting data:', error);
         }
     }
+
+    async createData(endpoint: string, newData: T): Promise<T | undefined> {
+        try {
+            const response = await axios.post(`${config.baseApiUrl}/${endpoint}`, newData);
+            return response.data;
+        } catch (error) {
+            console.error('Error adding data:', error);
+        }
+    }
 }
