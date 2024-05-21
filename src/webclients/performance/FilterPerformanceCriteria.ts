@@ -7,4 +7,5 @@ export interface FilterPerformanceCriteria {
     authorId: number | undefined;
     authorCountryId: number | undefined;
     centuryOfPlayWriting: number | undefined;
+    isUpcoming: boolean | undefined;
 }

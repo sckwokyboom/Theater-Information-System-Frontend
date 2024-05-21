@@ -3,6 +3,19 @@ import {Performance} from "./Performance.ts";
 import {FilterPerformanceCriteria} from "./FilterPerformanceCriteria.ts";
 
 export class PerformanceClient extends BaseClient<Performance, FilterPerformanceCriteria> {
+    private static instance: PerformanceClient | null = null;
+
+    private constructor() {
+        super();
+    }
+
+    public static getInstance(): PerformanceClient {
+        if (!PerformanceClient.instance) {
+            PerformanceClient.instance = new PerformanceClient();
+        }
+        return PerformanceClient.instance;
+    }
+
     override constructFilterQueryPart(filterParams: FilterPerformanceCriteria): string {
         const queryParams: string[] = [];
         if (filterParams.repertoireId) {
@@ -29,7 +42,25 @@ export class PerformanceClient extends BaseClient<Performance, FilterPerformance
         if (filterParams.centuryOfPlayWriting) {
             queryParams.push(`centuryOfPlayWriting=${filterParams.centuryOfPlayWriting}`);
         }
+        if (filterParams.isUpcoming) {
+            queryParams.push(`isUpcoming=${filterParams.isUpcoming}`);
+        }
         return queryParams.join('&');
+    }
+
+    getUpcomingPerformances(): Promise<Performance[] | undefined> {
+        const upcomingFilter = {
+            repertoireId: undefined,
+            isPremiere: undefined,
+            genreId: undefined,
+            dateOfStart: undefined,
+            dateOfEnd: undefined,
+            authorId: undefined,
+            authorCountryId: undefined,
+            centuryOfPlayWriting: undefined,
+            isUpcoming: true
+        }
+        return this.fetchData("performances/filter", upcomingFilter)
     }
 
 }
