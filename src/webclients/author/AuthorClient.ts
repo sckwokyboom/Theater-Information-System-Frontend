@@ -3,6 +3,19 @@ import {FilterAuthorCriteria} from "./FilterAuthorCriteria.ts";
 import {Author} from "./Author.ts";
 
 export class AuthorClient extends BaseClient<Author, FilterAuthorCriteria> {
+    private static instance: AuthorClient | null = null;
+
+    private constructor() {
+        super();
+    }
+
+    public static getInstance(): AuthorClient {
+        if (!AuthorClient.instance) {
+            AuthorClient.instance = new AuthorClient();
+        }
+        return AuthorClient.instance;
+    }
+
     override constructFilterQueryPart(filterParams: FilterAuthorCriteria): string {
         const queryParams: string[] = [];
         if (filterParams.wasPerformed) {
@@ -24,6 +37,18 @@ export class AuthorClient extends BaseClient<Author, FilterAuthorCriteria> {
             queryParams.push(`dateOfEndPerformanceAuthorsPlays=${filterParams.dateOfEndPerformanceAuthorsPlays}`);
         }
         return queryParams.join('&');
+    }
+
+    async getAllAuthors(): Promise<Author[] | undefined> {
+        return await this.fetchData("authors", {
+                wasPerformed: undefined,
+                centuryOfLiving: undefined,
+                countryOfOriginId: undefined,
+                genreId: undefined,
+                dateOfStartPerformanceAuthorsPlays: undefined,
+                dateOfEndPerformanceAuthorsPlays: undefined
+            }
+        )
     }
 }
 

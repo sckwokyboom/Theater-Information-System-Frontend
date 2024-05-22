@@ -7,6 +7,11 @@ import {Performance} from '../../webclients/performance/Performance.ts'
 import {Place} from "../../webclients/place/Place.ts";
 import {PlaceClient} from "../../webclients/place/PlaceClient.ts";
 import {BuySubscriptionRequest} from "../../webclients/subscription/BuySubscriptionRequest.ts";
+import FilteredTable from "../FilteredTable.tsx";
+import {Subscription} from "../../webclients/subscription/Subscription.ts";
+import {FilterSubscriptionCriteria} from "../../webclients/subscription/FilterSubscriptionCriteria.ts";
+
+import {SubscriptionClient} from "../../webclients/subscription/SubscriptionClient.ts";
 
 function SubscriptionsPage() {
     const buySubscriptionRequestClient = BuySubscriptionRequestClient.getInstance()
@@ -15,10 +20,28 @@ function SubscriptionsPage() {
     const [places, setPlaces] = useState<Place[]>([]);
     const [selectedPerformance, setSelectedPerformance] = useState<Performance | undefined>(undefined);
     const [selectedPlace, setSelectedPlace] = useState<Place | undefined>(undefined);
-    // const [purchasedPerformancesIds, setPurchasedPerformancesIds] = useState<Performance[]>([])
-    // const [purchasedPlaceIds, setPurchasedPlaceIds] = useState<Place[]>([])
     const [purchasedTickets, setPurchasedTickets] = useState<{ performance: Performance, place: Place }[]>([]);
+    const [editingSubscriptionIndex, setEditingSubscriptionIndex] = useState<number | null>(null);
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
 
+    const fetchData = async (_: FilterSubscriptionCriteria): Promise<Subscription[]> => {
+        try {
+            const data = await SubscriptionClient.getInstance().getAllSubscriptions()
+            if (data) {
+                setSubscriptions(data)
+                return data
+            }
+            return []
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return []
+        }
+    }
+
+
+    const toggleEditMode = (index: number) => {
+        setEditingSubscriptionIndex(index);
+    };
 
     const handlePerformanceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedId = Number(event.target.value);
@@ -48,31 +71,12 @@ function SubscriptionsPage() {
     };
 
 
-    const handleUpdateEmployee = async () => {
+    const handleDeleteSubscription = async (subscriptionId: number) => {
         try {
-            if (editedEmployee) {
-                const updatedEmployee = await buySubscriptionRequestClient.updateData("performances", editedEmployee.id, editedEmployee)
-                if (updatedEmployee) {
-                    const updatedEmployees = [...performances];
-                    updatedEmployees[editingEmployeeIndex!] = editedEmployee;
-                    console.log(`Person ${editingEmployeeIndex!} was updated`)
-                    setPerformances(updatedEmployees);
-                    setEditingEmployeeIndex(null);
-                    setEditedEmployee(null);
-                }
-            }
-        } catch (error) {
-            console.error('Error updating employee:', error);
-        }
-    };
-
-    const handleDeleteEmployee = async (employeeId: number) => {
-        try {
-            const deleted = await buySubscriptionRequestClient.deleteData("performances", employeeId)
+            const deleted = await buySubscriptionRequestClient.deleteData("subscriptions", subscriptionId)
             if (deleted) {
-                setPerformances(performances.filter(employee => employee.id !== employeeId));
-                setEditingEmployeeIndex(null);
-                setEditedEmployee(null);
+                setSubscriptions(subscriptions.filter(subscription => subscription.id !== subscriptionId));
+                setEditingSubscriptionIndex(null);
             }
         } catch (error) {
             console.error('Error deleting employee:', error);
@@ -86,6 +90,7 @@ function SubscriptionsPage() {
         }
         setSelectedPerformance(undefined)
         setSelectedPlace(undefined)
+
     };
 
     useEffect(() => {
@@ -103,21 +108,51 @@ function SubscriptionsPage() {
         fetchUpcomingPerformancesOptions().then()
     }, []);
 
-    const handleBuySubscription = () => {
+    const handleBuySubscription = async () => {
         const request: BuySubscriptionRequest = {
             performanceIds: purchasedTickets.map(item => item.performance.id),
             placeIds: purchasedTickets.map(item => item.place.id),
         };
         console.log(request)
-        BuySubscriptionRequestClient.getInstance().buySubscription(request).then()
+        BuySubscriptionRequestClient.getInstance()
+            .buySubscription(request)
+            .then(_ => fetchData({}))
+        setPurchasedTickets([])
     };
+
+    const renderRow = (subscription: Subscription, index: number) => (
+        <tr key={subscription.id}
+            onClick={() => {
+                if (index !== editingSubscriptionIndex) {
+                    toggleEditMode(index);
+                }
+            }}>
+            <td>{subscription.id}</td>
+            <td>{subscription.price}</td>
+            <td style={{textAlign: "center"}}>
+                <button onClick={() => handleDeleteSubscription(subscription.id)}>Удалить абонемент</button>
+            </td>
+        </tr>
+    );
 
     return (
         <div>
+            <label>
+                Уже купленные абонементы
+                <FilteredTable<Subscription, FilterSubscriptionCriteria>
+                    fetchData={fetchData}
+                    renderRow={renderRow}
+                    FilterComponent={undefined}
+                    tableHeaders={["ID", "Цена", "Удаление"]}
+                    tableData={subscriptions}
+                    filterInitialState={{}}
+                />
+            </label>
             <div style={{display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
                 {purchasedTickets.map((item, index) => (
                     <div key={index} style={{marginBottom: '10px'}}>
-                        Билет на спектакль: {item.performance.playTitle}. Дата: {item.performance.date}.
+                        Билет на спектакль: {item.performance.playTitle}. Дата:
+                        с {item.performance.startTime} по {item.performance.endTime}.
                         Место: {item.place.id} ({item.place.priceCoefficient * item.performance.basePrice} руб.)
                     </div>
                 ))}
@@ -129,7 +164,7 @@ function SubscriptionsPage() {
                         <option value="">--Выберите спектакль--</option>
                         {performances.map(performance => (
                             <option key={performance.id} value={performance.id}>
-                                {performance.playTitle} ({performance.date})
+                                {performance.playTitle} (с {performance.startTime} по {performance.endTime})
                             </option>
                         ))}
                     </select>

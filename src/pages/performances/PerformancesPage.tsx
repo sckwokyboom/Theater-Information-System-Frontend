@@ -1,26 +1,42 @@
 import '../../App.css'
 import {Performance} from '../../webclients/performance/Performance.ts'
-import {useState} from "react";
-import axios from "axios";
+import React, {useState} from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import DatePicker from "react-datepicker";
+import {PerformanceClient} from "../../webclients/performance/PerformanceClient.ts";
+import {FilterPerformanceCriteria} from "../../webclients/performance/FilterPerformanceCriteria.ts";
+import FilteredTable from "../FilteredTable.tsx";
+import FilterPerformancesForm from "./FilterPerformancesForm.tsx";
 
 function PerformancesPage() {
+    const performanceClient = PerformanceClient.getInstance()
     const [performances, setPerformances] = useState<Performance[]>([]);
     const [editingPerformanceIndex, setEditingPerformanceIndex] = useState<number | null>(null);
     const [editedPerformance, setEditedPerformance] = useState<Performance | null>(null);
 
+    const fetchData = async (filters: FilterPerformanceCriteria): Promise<Performance[]> => {
+        try {
+            const data = await performanceClient.fetchData("performances/filter", filters)
+            if (data) {
+                setPerformances(data)
+                return data
+            }
+            return []
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return []
+        }
+    }
 
     const toggleEditMode = (index: number) => {
-        setEditingPerformanceIndex(index);
-        setEditedPerformance({...performances[index]});
+        // setEditingPerformanceIndex(index);
+        // setEditedPerformance({...performances[index]});
     };
 
 
     const handleUpdatePerformance = async () => {
         try {
             if (editedPerformance) {
-                await axios.put(`http://localhost:8080/performances/${editedPerformance.id}`, editedPerformance);
+                performanceClient.createData("performances", editedPerformance).then()
                 const updatedEmployees = [...performances];
                 updatedEmployees[editingPerformanceIndex!] = editedPerformance;
                 setPerformances(updatedEmployees);
@@ -32,10 +48,10 @@ function PerformancesPage() {
         }
     };
 
-    const handleDeletePerformance = async (employeeId: number) => {
+    const handleDeletePerformance = async (performanceId: number) => {
         try {
-            await axios.delete(`http://localhost:8080/employees/${employeeId}`);
-            setPerformances(performances.filter(employee => employee.id !== employeeId));
+            performanceClient.deleteData("performances", performanceId).then()
+            setPerformances(performances.filter(employee => employee.id !== performanceId));
             setEditingPerformanceIndex(null);
             setEditedPerformance(null);
         } catch (error) {
@@ -43,95 +59,91 @@ function PerformancesPage() {
         }
     };
 
+    const renderRow = (performance: Performance, index: number) => (
+        <tr key={performance.id}
+            onClick={() => {
+                if (index != editingPerformanceIndex) {
+                    toggleEditMode(index)
+                }
+            }}>
+            <td>{performance.id}</td>
+            <td>{performance.playTitle}</td>
+            <td>{performance.playGenre}</td>
+            <td>{performance.centuryOfPlayWriting}</td>
+            <td>{performance.authorFirstName}</td>
+            <td>{performance.authorSecondName}</td>
+            <td>{editingPerformanceIndex === index ? (
+                <DatePicker selected={editedPerformance?.startTime}
+                            onChange={(date: Date) => setEditedPerformance({
+                                ...editedPerformance!,
+                                endTime: date.toISOString()
+                            })}/>
+            ) : performance.startTime}</td>
+            <td>{performance.hallTitle}</td>
+            <td>{editingPerformanceIndex === index ? (
+                <select value={editedPerformance?.ageCategory || ""}
+                        onChange={(e) => setEditedPerformance({
+                            ...editedPerformance!,
+                            ageCategory: e.target.value
+                        })}>
+                    <option value="0+">Male</option>
+                    <option value="6+">Male</option>
+                    <option value="12+">Male</option>
+                    <option value="16+">Male</option>
+                    <option value="18+">Male</option>
+                </select>
+            ) : performance.ageCategory}</td>
+
+            <td>{editingPerformanceIndex === index ? (
+                <input type="number" value={editedPerformance?.basePrice || 0}
+                       onChange={(e) => setEditedPerformance({
+                           ...editedPerformance!,
+                           basePrice: parseInt(e.target.value)
+                       })}/>
+            ) : performance.basePrice}</td>
+
+            <td>{editingPerformanceIndex === index ? (
+                <input type="string" value={editedPerformance?.isPremiere == true ? "Да" : ""}
+                       onChange={(e) => setEditedPerformance({
+                           ...editedPerformance!,
+                           isPremiere: e.target.value == "true"
+                       })}/>
+            ) : performance.isPremiere}</td>
+
+            {editingPerformanceIndex === index && (
+                <td>
+                    <button onClick={handleUpdatePerformance}>Save Changes</button>
+                </td>
+            )}
+            {editingPerformanceIndex === index && (
+                <td>
+                    <button onClick={() => handleDeletePerformance(performance.id)}>Delete employee
+                    </button>
+                </td>
+            )}
+        </tr>
+    );
+
     return (
-        // <FilteredTable fetchData={} filterInitialState={} renderRow={} FilterComponent={} tableHeaders={}
-        <div className="table-and-filter-container">
-            {/*<Filter onFilterChange={handleFilterChange}/>*/}
-            <div className="table-container">
-                <table className="table">
-                    <thead className="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Название пьесы</th>
-                        <th>Жанр</th>
-                        <th>Век написания пьесы</th>
-                        <th>Имя автора</th>
-                        <th>Фамилия автора</th>
-                        <th>Дата показа</th>
-                        <th>Зал</th>
-                        <th>Возрастная категория</th>
-                        <th>Базовая стоимость билета</th>
-                        <th>Премьера</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {performances.map((performance, index) => (
-                        <tr key={performance.id}
-                            onClick={() => {
-                                if (index != editingPerformanceIndex) {
-                                    toggleEditMode(index)
-                                }
-                            }}>
-                            <td>{performance.id}</td>
-                            <td>{performance.playTitle}</td>
-                            <td>{performance.playGenre}</td>
-                            <td>{performance.centuryOfPlayWriting}</td>
-                            <td>{performance.authorFirstName}</td>
-                            <td>{performance.authorSecondName}</td>
-                            <td>{editingPerformanceIndex === index ? (
-                                <DatePicker selected={editedPerformance?.date}
-                                            onChange={(date: Date) => setEditedPerformance({
-                                                ...editedPerformance!,
-                                                date: date.toISOString()
-                                            })}/>
-                            ) : performance.date}</td>
-                            <td>{performance.hallTitle}</td>
-                            <td>{editingPerformanceIndex === index ? (
-                                <select value={editedPerformance?.ageCategory || ""}
-                                        onChange={(e) => setEditedPerformance({
-                                            ...editedPerformance!,
-                                            ageCategory: e.target.value
-                                        })}>
-                                    <option value="0+">Male</option>
-                                    <option value="6+">Male</option>
-                                    <option value="12+">Male</option>
-                                    <option value="16+">Male</option>
-                                    <option value="18+">Male</option>
-                                </select>
-                            ) : performance.ageCategory}</td>
-
-                            <td>{editingPerformanceIndex === index ? (
-                                <input type="number" value={editedPerformance?.basePrice || 0}
-                                       onChange={(e) => setEditedPerformance({
-                                           ...editedPerformance!,
-                                           basePrice: parseInt(e.target.value)
-                                       })}/>
-                            ) : performance.basePrice}</td>
-
-                            <td>{editingPerformanceIndex === index ? (
-                                <input type="string" value={editedPerformance?.isPremiere == true ? "Да" : ""}
-                                       onChange={(e) => setEditedPerformance({
-                                           ...editedPerformance!,
-                                           isPremiere: e.target.value == "true"
-                                       })}/>
-                            ) : performance.isPremiere}</td>
-
-                            {editingPerformanceIndex === index && (
-                                <td>
-                                    <button onClick={handleUpdatePerformance}>Save Changes</button>
-                                </td>
-                            )}
-                            {editingPerformanceIndex === index && (
-                                <td>
-                                    <button onClick={() => handleDeletePerformance(performance.id)}>Delete employee
-                                    </button>
-                                </td>
-                            )}
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+        <div>
+            <FilteredTable<Performance, FilterPerformanceCriteria>
+                fetchData={fetchData}
+                filterInitialState={{
+                    repertoireId: undefined,
+                    isPremiere: undefined,
+                    genreId: undefined,
+                    dateOfStart: undefined,
+                    dateOfEnd: undefined,
+                    authorId: undefined,
+                    authorCountryId: undefined,
+                    centuryOfPlayWriting: undefined,
+                    isUpcoming: undefined
+                }}
+                renderRow={renderRow}
+                FilterComponent={FilterPerformancesForm}
+                tableHeaders={["ID", "Название пьесы", "Жанр", "Век написания пьесы", "Имя автора", "Фамилия автора", "Дата показа", "Зал", "Возрастная категория", "Базовая стоимость билета", "Премьера"]}
+                tableData={performances}
+            />
         </div>
     )
 }

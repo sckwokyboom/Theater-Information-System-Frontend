@@ -20,12 +20,9 @@ export class ActorClient extends BaseClient<Actor, FilterActorCriteria> {
         return await this.fetchData("actors", {
             roleWeight: undefined,
             roleHeight: undefined,
-            roleEyeColor: undefined,
             roleSkinColor: undefined,
             roleHairColor: undefined,
             roleVoiceType: undefined,
-            roleGender: undefined,
-            roleAge: undefined,
             roleNationalityId: undefined,
             titleId: undefined,
             age: undefined,
@@ -43,9 +40,6 @@ export class ActorClient extends BaseClient<Actor, FilterActorCriteria> {
         if (filterParams.roleHeight) {
             queryParams.push(`roleHeight=${filterParams.roleHeight}`);
         }
-        if (filterParams.roleEyeColor) {
-            queryParams.push(`roleEyeColor=${filterParams.roleEyeColor}`);
-        }
         if (filterParams.roleSkinColor) {
             queryParams.push(`roleSkinColor=${filterParams.roleSkinColor}`);
         }
@@ -54,12 +48,6 @@ export class ActorClient extends BaseClient<Actor, FilterActorCriteria> {
         }
         if (filterParams.roleVoiceType) {
             queryParams.push(`roleVoiceType=${filterParams.roleVoiceType}`);
-        }
-        if (filterParams.roleGender) {
-            queryParams.push(`roleGender=${filterParams.roleGender}`);
-        }
-        if (filterParams.roleAge) {
-            queryParams.push(`roleAge=${filterParams.roleAge}`);
         }
         if (filterParams.roleNationalityId) {
             queryParams.push(`roleNationalityId=${filterParams.roleNationalityId}`);

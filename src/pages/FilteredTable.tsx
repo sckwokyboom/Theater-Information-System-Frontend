@@ -4,7 +4,7 @@ interface FilteredTableProps<DataType, FilterCriteria> {
     fetchData: (filters: FilterCriteria) => Promise<DataType[]>;
     filterInitialState: FilterCriteria;
     renderRow: (dataItem: DataType, index: number) => React.ReactNode;
-    FilterComponent: React.FC<{ onFilterChange: (filters: FilterCriteria) => void }>;
+    FilterComponent: React.FC<{ onFilterChange: (filters: FilterCriteria) => void }> | undefined;
     tableHeaders: string[];
     tableData: DataType[];
 }
@@ -37,9 +37,9 @@ const FilteredTable = <DataType, FilterCriteria>({
 
     return (
         <div className="filtered-table-container">
-            <FilterComponent
+            {FilterComponent && <FilterComponent
                 onFilterChange={handleFilterChange}
-            />
+            />}
             <div className="table-container">
                 <table className="table">
                     <thead className="thead-dark">

@@ -7,6 +7,10 @@ import {Author} from "../../webclients/author/Author.ts";
 import {Country} from "../../webclients/country/Country.ts";
 import {FilterPerformanceCriteria} from "../../webclients/performance/FilterPerformanceCriteria.ts";
 import {FilterProps} from "../../FilterProps.ts";
+import {GenreClient} from "../../webclients/genre/GenreClient.ts";
+import {CountryClient} from "../../webclients/country/CountryClient.ts";
+import {RepertoireClient} from "../../webclients/repertoire/RepertoireClient.ts";
+import {AuthorClient} from "../../webclients/author/AuthorClient.ts";
 
 const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterPerformanceCriteria>({
@@ -17,7 +21,8 @@ const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChang
         dateOfEnd: undefined,
         authorId: undefined,
         authorCountryId: undefined,
-        centuryOfPlayWriting: undefined
+        centuryOfPlayWriting: undefined,
+        isUpcoming: undefined
     });
 
     const [startDate, setStartDate] = useState<string | undefined | null>();
@@ -69,66 +74,56 @@ const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChang
     const [countriesOptions, setCountriesOptions] = useState<Country[]>([])
 
     useEffect(() => {
-        const fetchRepertoiresOptions = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/repertoires/all");
-                console.log(response)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setRepertoiresOptions(data);
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error);
-            }
-        };
-
         const fetchGenresOptions = async () => {
+            const genresClient = GenreClient.getInstance()
             try {
-                const response = await fetch("http://localhost:8080/genres/all");
-                console.log(response)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                const genres = await genresClient.fetchAllGenres()
+                if (genres) {
+                    setGenresOptions(genres);
                 }
-                const data = await response.json();
-                setGenresOptions(data);
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         };
 
-        const fetchAuthorsOptions = async () => {
+        const fetchRepertoiresOptions = async () => {
+            const repertoiresClient = RepertoireClient.getInstance()
             try {
-                const response = await fetch("http://localhost:8080/authors/all");
-                console.log(response)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                const repertoires = await repertoiresClient.getAllRepertoires()
+                if (repertoires) {
+                    setRepertoiresOptions(repertoires)
                 }
-                const data = await response.json();
-                setAuthorsOptions(data);
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         };
-
         const fetchCountriesOptions = async () => {
+
+            const countriesClient = CountryClient.getInstance()
             try {
-                const response = await fetch("http://localhost:8080/countries/all");
-                console.log(response)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                const countries = await countriesClient.fetchAllCountries()
+                if (countries) {
+                    setCountriesOptions(countries);
                 }
-                const data = await response.json();
-                setCountriesOptions(data);
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         };
-
-        fetchRepertoiresOptions();
-        fetchGenresOptions();
-        fetchAuthorsOptions();
-        fetchCountriesOptions()
+        const fetchAuthorsOptions = async () => {
+            const authorsClient = AuthorClient.getInstance()
+            try {
+                const authors = await authorsClient.getAllAuthors()
+                if (authors) {
+                    setAuthorsOptions(authors);
+                }
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        };
+        fetchRepertoiresOptions().then();
+        fetchAuthorsOptions().then();
+        fetchGenresOptions().then()
+        fetchCountriesOptions().then();
     }, []);
 
     const mapRepertoireToDateString = (repertoire: Repertoire) => {

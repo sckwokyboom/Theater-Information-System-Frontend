@@ -20,6 +20,13 @@
     /*background-color: #1b1b1b;*/
 }
 
+.nav-link {
+    display: block;
+    margin: 5px 0; /* Добавить отступ для лучшего восприятия */
+    text-decoration: none; /* Убрать подчеркивание */
+    color: inherit; /* Наследовать цвет текста */
+}
+
 .main-content {
     flex: 1;
     display: flex;

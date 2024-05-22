@@ -5,7 +5,8 @@ export class Performance {
     centuryOfPlayWriting: number;
     authorFirstName: string;
     authorSecondName: string;
-    date: string;
+    startTime: string;
+    endTime: string;
     hallTitle: string;
     ageCategory: string;
     basePrice: number;
@@ -15,7 +16,8 @@ export class Performance {
                 playTitle: string,
                 playGenre: string,
                 ageCategory: string,
-                date: string,
+                startTime: string,
+                endTime: string,
                 authorFirstName: string,
                 authorSecondName: string,
                 hallTitle: string,
@@ -26,7 +28,8 @@ export class Performance {
         this.playTitle = playTitle;
         this.playGenre = playGenre;
         this.ageCategory = ageCategory;
-        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.hallTitle = hallTitle;
         this.basePrice = basePrice;
         this.centuryOfPlayWriting = centuryOfPlayWriting;
