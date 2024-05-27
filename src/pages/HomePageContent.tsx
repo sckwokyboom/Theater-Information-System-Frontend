@@ -1,5 +1,5 @@
 import {Box, Typography} from '@mui/material';
-import theaterPhoto from '../assets/theater_photo.jpg';
+import theaterPhoto from '../../public/theater_photo.jpg';
 
 export default function HomePageContent() {
     return (
