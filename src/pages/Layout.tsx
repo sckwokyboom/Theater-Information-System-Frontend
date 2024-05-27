@@ -14,7 +14,7 @@ const navItems = [
     {path: '/tickets', label: 'Билеты'},
     {path: '/subscriptions', label: 'Оформление абонемента'},
     {path: '/places', label: 'Свободные места'},
-    {path: '/performancesinfo', label: 'Информация о спектакле'},
+    {path: '/performancesinfo', label: 'Информация о спектаклях'},
 ];
 
 const theme = createTheme({

@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {Button, DatePicker, Popover} from 'antd';
-import '../../styles/Filter.css';
+import {Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Snackbar} from '@mui/material';
+import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFnsV3";
 import {FilterProps} from "../../FilterProps.ts";
 import {FilterTicketCriteria} from "../../webclients/ticket/FilterTicketCriteria.ts";
 import {Performance} from "../../webclients/performance/Performance.ts";
 import {PerformanceClient} from "../../webclients/performance/PerformanceClient.ts";
+import MuiAlert, {AlertProps} from '@mui/material/Alert';
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const FilterTicketsForm: React.FC<FilterProps<FilterTicketCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterTicketCriteria>({
@@ -19,6 +25,7 @@ const FilterTicketsForm: React.FC<FilterProps<FilterTicketCriteria>> = ({onFilte
     const [startDate, setStartDate] = useState<string | undefined | null>();
     const [endDate, setEndDate] = useState<string | undefined | null>();
     const [error, setError] = useState<string>('');
+    const [open, setOpen] = useState(false);
 
     function formatDate(date: Date): string {
         const year = date.getFullYear();
@@ -27,139 +34,155 @@ const FilterTicketsForm: React.FC<FilterProps<FilterTicketCriteria>> = ({onFilte
         return `${year}-${month}-${day}`;
     }
 
-    const handleStartDateChange = (date: string | null) => {
-        setStartDate(date);
+    const handleStartDateChange = (date: Date | null) => {
+        setStartDate(date ? date.toISOString() : null);
         setFilters({
             ...filters,
-            dateOfStart: date ? formatDate(new Date(date)) : undefined
+            dateOfStart: date ? formatDate(date) : undefined
         });
     };
 
-    const handleEndDateChange = (date: string | null) => {
-        setEndDate(date);
+    const handleEndDateChange = (date: Date | null) => {
+        setEndDate(date ? date.toISOString() : null);
         setFilters({
             ...filters,
-            dateOfEnd: date ? formatDate(new Date(date)) : undefined
+            dateOfEnd: date ? formatDate(date) : undefined
         });
     };
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+
+    const handleSelectChange = (event: SelectChangeEvent<string>) => {
         const {name, value} = event.target;
-        setFilters({...filters, [name]: value.toString()});
+        setFilters({...filters, [name]: value});
     };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (startDate != undefined && endDate != undefined && endDate < startDate) {
             setError('Выберите корректные даты начала и конца периода.');
+            setOpen(true);
             return;
         }
         setError('');
         onFilterChange(filters);
-        console.log(filters)
     };
 
-    const [performancesOptions, setPerformancesOptions] = useState<Performance[]>([])
+    const [performancesOptions, setPerformancesOptions] = useState<Performance[]>([]);
 
     useEffect(() => {
-
         const fetchPerformancesOptions = async () => {
-            const repertoiresClient = PerformanceClient.getInstance()
+            const repertoiresClient = PerformanceClient.getInstance();
             try {
-                const performances = await repertoiresClient.getAllPerformances()
+                const performances = await repertoiresClient.getAllPerformances();
                 if (performances) {
-                    setPerformancesOptions(performances)
+                    setPerformancesOptions(performances);
                 }
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         };
-
         fetchPerformancesOptions().then();
     }, []);
 
     return (
-        <form onSubmit={handleSubmit} className="filter-form">
-            <label className="form-label">
-                Спектакль:
-                <select
-                    name="performanceId"
-                    value={filters.performanceId}
-                    onChange={handleInputChange}
-                    className="form-input">
-                    <option></option>
-                    {performancesOptions.map(performance => (
-                        <option key={performance.id} value={performance.id}>
-                            {performance.playTitle} ({performance.startTime} - {performance.endTime}).
-                            Зал: {performance.hallTitle}
-                        </option>
-                    ))}
-                </select>
-            </label>
-
-            <label className="form-label">
-                Премьера:
-                <select name="isPremiere"
-                        value={filters.isPremiere}
-                        onChange={handleInputChange}
-                        className="form-select">
-                    <option></option>
-                    <option value={"true"}>Да</option>
-                    <option value={"false"}>Нет</option>
-                </select>
-            </label>
-
-            <label className="form-label">
-                Предстоящий спектакль:
-                <select name="isUpcomingPerformances"
-                        value={filters.isUpcomingPerformances}
-                        onChange={handleInputChange}
-                        className="form-select">
-                    <option></option>
-                    <option value={"true"}>Да</option>
-                    <option value={"false"}>Нет</option>
-                </select>
-            </label>
-
-
-            <label className="form-label">
-                Начиная с даты:
-                <DatePicker
-                    allowClear={true}
-                    name="dateOfStart"
-                    onChange={handleStartDateChange}
-                    value={startDate}
-                    className="form-input"
-                />
-            </label>
-
-            <label className="form-label">
-                Заканчивая датой:
-                <DatePicker
-                    allowClear={true}
-                    name="dateOfEnd"
-                    onChange={handleEndDateChange}
-                    value={endDate}
-                    className="form-input"
-                />
-            </label>
-            {error && <Popover content={error}><Button type="primary" danger>Ошибка</Button></Popover>}
-
-
-            <label className="form-label">
-                Продан предварительно:
-                <select name="isPreSold"
-                        value={filters.isPreSold}
-                        onChange={handleInputChange}
-                        className="form-select">
-                    <option></option>
-                    <option value={"true"}>Да</option>
-                    <option value={"false"}>Нет</option>
-                </select>
-            </label>
-
-            <button type="submit" className="form-button">Применить фильтр</button>
-        </form>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <form onSubmit={handleSubmit} className="filter-form">
+                <Box mb={2}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Спектакль</InputLabel>
+                        <Select
+                            name="performanceId"
+                            value={filters.performanceId?.toString() == undefined ? '' : filters.performanceId?.toString()}
+                            onChange={handleSelectChange}
+                            label="Спектакль"
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {performancesOptions.map(performance => (
+                                <MenuItem key={performance.id} value={performance.id}>
+                                    {performance.playTitle} ({performance.startTime} - {performance.endTime}).
+                                    Зал: {performance.hallTitle}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box mb={2}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Премьера</InputLabel>
+                        <Select
+                            name="isPremiere"
+                            value={filters.isPremiere == undefined ? '' : filters.isPremiere}
+                            onChange={handleSelectChange}
+                            label="Премьера"
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value="true">Да</MenuItem>
+                            <MenuItem value="false">Нет</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box mb={2}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Предстоящий спектакль</InputLabel>
+                        <Select
+                            name="isUpcomingPerformances"
+                            value={filters.isUpcomingPerformances == undefined ? '' : filters.isUpcomingPerformances}
+                            onChange={handleSelectChange}
+                            label="Предстоящий спектакль"
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value="true">Да</MenuItem>
+                            <MenuItem value="false">Нет</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box mb={2}>
+                    <DatePicker
+                        label="Начиная с даты"
+                        value={startDate ? new Date(startDate) : null}
+                        onChange={handleStartDateChange}
+                        // renderInput={(params) => <TextField {...params} fullWidth/>}
+                    />
+                </Box>
+                <Box mb={2}>
+                    <DatePicker
+                        label="Заканчивая датой"
+                        value={endDate ? new Date(endDate) : null}
+                        onChange={handleEndDateChange}
+                        // renderInput={(params) => <TextField {...params} fullWidth/>}
+                    />
+                </Box>
+                <Box mb={2}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Продан предварительно</InputLabel>
+                        <Select
+                            name="isPreSold"
+                            value={filters.isPreSold == undefined ? '' : filters.isPreSold}
+                            onChange={handleSelectChange}
+                            label="Продан предварительно"
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value="true">Да</MenuItem>
+                            <MenuItem value="false">Нет</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Button type="submit" variant="contained" color="primary">Применить фильтр</Button>
+                <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
+                    <Alert onClose={() => setOpen(false)} severity="error">
+                        {error}
+                    </Alert>
+                </Snackbar>
+            </form>
+        </LocalizationProvider>
     );
 };
 
