@@ -9,7 +9,7 @@ import {FilterPerformanceInfoCriteria} from "../../webclients/performanceinfo/Fi
 
 
 function PerformancesInfoPage() {
-    const employeeClient = new EmployeeClient()
+    const employeeClient = EmployeeClient.getInstance()
     const employeeHeaders = ["ID", "Имя", "Фамилия", "Отчество", "Пол", "Дата рождения", "Дата найма", "Зарплата", "Количество детей"]
     const authorHeaders = ["ID", "Имя", "Фамилия", "Отчество", "Дата рождения", "Дата смерти", "Страна происхождения"]
     const fetchData = async (filters: FilterPerformanceInfoCriteria) => {
