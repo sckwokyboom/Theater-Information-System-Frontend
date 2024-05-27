@@ -16,8 +16,8 @@ export class SubscriptionClient extends BaseClient<Subscription, FilterSubscript
         return SubscriptionClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterSubscriptionCriteria): string {
-        return "";
+    override constructFilterQueryPart(): string | null {
+        return null;
     }
 
     getAllSubscriptions(): Promise<Subscription [] | undefined> {

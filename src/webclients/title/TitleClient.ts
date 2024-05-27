@@ -16,7 +16,7 @@ export class TitleClient extends BaseClient<Title, FilterTitleCriteria> {
         return TitleClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterTitleCriteria): string | null {
+    override constructFilterQueryPart(): string | null {
         return null;
     }
 

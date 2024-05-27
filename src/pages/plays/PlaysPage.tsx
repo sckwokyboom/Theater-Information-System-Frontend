@@ -34,8 +34,8 @@ function PlaysPage() {
         fetchPlays();
     }, []);
     return (
-
         <>
+            <h1>Пьесы</h1>
             <table className="table">
                 <thead className="thead-dark">
                 <tr>

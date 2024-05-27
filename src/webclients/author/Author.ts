@@ -3,8 +3,8 @@ export class Author {
     firstName: string;
     secondName: string | undefined;
     patronymic: string | undefined;
-    dateOfBirth: string | undefined;
-    dateOfDeath: string | undefined;
+    dateOfBirth: string | undefined | null;
+    dateOfDeath: string | undefined | null;
     countryOfOriginName: string;
 
 
@@ -12,8 +12,8 @@ export class Author {
                 firstName: string,
                 secondName: string | undefined,
                 patronymic: string | undefined,
-                dateOfBirth: string,
-                dateOfDeath: string | undefined,
+                dateOfBirth: string | undefined | null,
+                dateOfDeath: string | undefined | null,
                 countryOfOrigin: string
     ) {
         this.id = id;

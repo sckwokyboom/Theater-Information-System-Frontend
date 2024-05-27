@@ -17,7 +17,7 @@ export class RoleClient extends BaseClient<Role, FilterRoleCriteria> {
         return RoleClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterRoleCriteria): string | null {
+    override constructFilterQueryPart(): string | null {
         return null;
     }
 

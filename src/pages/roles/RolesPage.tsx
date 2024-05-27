@@ -1,6 +1,5 @@
 import '../../App.css'
-import React, {useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import {useState} from "react";
 import FilteredTable from "../FilteredTable.tsx";
 import {RoleClient} from "../../webclients/role/RoleClient.ts";
 import {FilterRoleCriteria} from "../../webclients/role/FilterRoleCriteria.ts";
@@ -10,7 +9,7 @@ function RolesPage() {
     const rolesClient = RoleClient.getInstance()
     const [roles, setRoles] = useState<Role[]>([]);
 
-    const fetchData = async (filters: FilterRoleCriteria): Promise<Role[]> => {
+    const fetchData = async (): Promise<Role[]> => {
         try {
             const data = await rolesClient.getAllRoles()
             console.log(data)
@@ -25,7 +24,7 @@ function RolesPage() {
         }
     }
 
-    const renderRow = (role: Role, index: number) => (
+    const renderRow = (role: Role) => (
         <tr key={role.id}>
             <td>{role.id}</td>
             <td>{role.name}</td>
@@ -43,6 +42,7 @@ function RolesPage() {
 
     return (
         <div>
+            <h1>Роли</h1>
             <FilteredTable<Role, FilterRoleCriteria>
                 fetchData={fetchData}
                 renderRow={renderRow}
@@ -51,6 +51,10 @@ function RolesPage() {
                 tableData={roles}
                 filterInitialState={{}}
             />
+            <hr/>
+            <label>
+                <b>Количество:</b> {roles.length}.
+            </label>
         </div>
     )
 }

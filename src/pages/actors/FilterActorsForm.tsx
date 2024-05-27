@@ -39,24 +39,27 @@ const FilterActorsForm: React.FC<FilterProps<FilterActorCriteria>> = ({onFilterC
 
         const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+            if (startDate != undefined && endDate != undefined && endDate < startDate) {
+                setError('Выберите корректные даты начала и конца периода.');
+                return;
+            }
             onFilterChange(filters);
             console.log(filters)
         };
 
         const voiceTypeOptions = ['', 'Тенор', 'Баритон', 'Бас', 'Контральто', 'Сопрано', 'Альт', 'Меццо-сопрано', 'Контртенор', 'Драматический тенор', 'Лирический тенор', 'Драматический баритон', 'Лирический баритон', 'Драматический бас', 'Легкий баритон', 'Лирический бас', 'Фальцет', 'Драматический контртенор', 'Лирический контртенор'];
-        const hairColorOptions = ['', 'ЧЕРНЫЙ', 'КОРИЧНЕВЫЙ', 'СВЕТЛО-КОРИЧНЕВЫЙ', 'РУСЫЙ', 'РЫЖИЙ', 'БЛОНДИН', 'СЕДОЙ', 'БЕЛЫЙ', 'СЕРЫЙ', 'ПЕПЕЛЬНЫЙ', 'ПЕСОЧНЫЙ', 'МЕДНЫЙ', 'ШАТЕН', 'КАШТАНОВЫЙ', 'МЕЛИРОВАННЫЙ', 'ОКРАШЕННЫЙ В ЧЁРНЫЙ', 'ОКРАШЕННЫЙ В КРАСНЫЙ', 'ОКРАШЕННЫЙ В СИНИЙ', 'ОКРАШЕННЫЙ В ЗЕЛЁНЫЙ', 'ОКРАШЕННЫЙ В ФИОЛЕТОВЫЙ', 'ОКРАШЕННЫЙ В РОЗОВЫЙ'];
+        const hairColorOptions = ['', 'ЧЕРНЫЙ', 'КОРИЧНЕВЫЙ', 'СВЕТЛО-КОРИЧНЕВЫЙ', 'СВЕТЛО-РУСЫЙ', 'РУСЫЙ', 'РЫЖИЙ', 'БЛОНДИН', 'СЕДОЙ', 'БЕЛЫЙ', 'СЕРЫЙ', 'ПЕПЕЛЬНЫЙ', 'ПЕСОЧНЫЙ', 'МЕДНЫЙ', 'ШАТЕН', 'КАШТАНОВЫЙ', 'МЕЛИРОВАННЫЙ', 'ОКРАШЕННЫЙ В ЧЁРНЫЙ', 'ОКРАШЕННЫЙ В КРАСНЫЙ', 'ОКРАШЕННЫЙ В СИНИЙ', 'ОКРАШЕННЫЙ В ЗЕЛЁНЫЙ', 'ОКРАШЕННЫЙ В ФИОЛЕТОВЫЙ', 'ОКРАШЕННЫЙ В РОЗОВЫЙ'];
         const skinColorOptions = ['', 'ОЧЕНЬ СВЕТЛЫЙ', 'СВЕТЛЫЙ', 'СРЕДНИЙ', 'ТЕМНЫЙ', 'ОЧЕНЬ ТЕМНЫЙ', 'ЧЕРНЫЙ'];
         const [nationalityOptions, setNationalityOptions] = useState<Nationality[]>([])
-        const [selectedNationalityOption, setSelectedNationalityOption] = useState<Nationality>();
         const [titleOptions, setTitleOptions] = useState<Title[]>([])
-        const [selectedTitleOption, setSelectedTitleOption] = useState<Title>();
         const [selectedVoiceTypeOption, setSelectedVoiceTypeOption] = useState('');
         const [selectedHairColorOption, setSelectedHairColorOption] = useState('');
         const [selectedSkinColorOption, setSelectedSkinColorOption] = useState('');
 
+
+        const [error, setError] = useState<string>('');
         const [startDate, setStartDate] = useState<string | undefined | null>();
         const [endDate, setEndDate] = useState<string | undefined | null>();
-        const [error, setError] = useState<string>('');
 
         function formatDate(date: Date): string {
             const year = date.getFullYear();
@@ -80,25 +83,6 @@ const FilterActorsForm: React.FC<FilterProps<FilterActorCriteria>> = ({onFilterC
                 dateOfEndForTitle: date ? formatDate(new Date(date)) : undefined
             });
         };
-
-        const handleSelectedHairColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            const {value} = event.target;
-            setSelectedHairColorOption(value)
-            handleInputChange(event)
-        };
-
-        const handleSelectedSkinColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            const {value} = event.target;
-            setSelectedSkinColorOption(value)
-            handleInputChange(event)
-        };
-
-        const handleSelectedVoiceTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            const {value} = event.target;
-            setSelectedVoiceTypeOption(value)
-            handleInputChange(event)
-        };
-
 
         useEffect(() => {
             const fetchNationalitiesOptions = async () => {
@@ -241,18 +225,18 @@ const FilterActorsForm: React.FC<FilterProps<FilterActorCriteria>> = ({onFilterC
                     <DatePicker
                         allowClear={true}
                         name="dateOfStartForTitle"
-                        onChange={handleEndDateChange}
+                        onChange={handleStartDateChange}
                         value={startDate}
                         className="form-input"
                     />
                 </label>
 
                 <label className="form-label">
-                    Спектакли по его пьесам были поставлены, заканчивая датой:
+                    Получил звание до даты:
                     <DatePicker
                         allowClear={true}
                         name="dateOfEndForTitle"
-                        onChange={handleStartDateChange}
+                        onChange={handleEndDateChange}
                         value={endDate}
                         className="form-input"
                     />

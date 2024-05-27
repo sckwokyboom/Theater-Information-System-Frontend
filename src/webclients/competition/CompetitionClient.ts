@@ -16,7 +16,7 @@ export class CompetitionClient extends BaseClient<Competition, FilterCompetition
         return CompetitionClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterCompetitionCriteria): string | null {
+    override constructFilterQueryPart(): string | null {
         return null;
     }
 

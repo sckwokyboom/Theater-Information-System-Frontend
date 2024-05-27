@@ -16,8 +16,8 @@ export class BuySubscriptionRequestClient extends BaseClient<BuySubscriptionRequ
         return BuySubscriptionRequestClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterSubscriptionCriteria): string {
-        return "";
+    override constructFilterQueryPart(): string | null {
+        return null;
     }
 
     async buySubscription(subscriptionRequest: BuySubscriptionRequest): Promise<BuySubscriptionRequest | undefined> {

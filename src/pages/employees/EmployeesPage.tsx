@@ -1,15 +1,15 @@
 import '../../App.css'
-import React, {useState} from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import {useState} from "react";
 import {Employee} from "../../webclients/employee/Employee.ts";
 import FilteredTable from "../FilteredTable.tsx";
 import FilterEmployeesForm from "./FilterEmployeesForm.tsx";
 import {EmployeeClient} from "../../webclients/employee/EmployeeClient.ts";
 import {FilterEmployeeCriteria} from "../../webclients/employee/FilterEmployeeCriteria.ts";
+import {DatePicker} from "antd";
+import {formatDate} from "../../utils/Date.ts";
 
 function EmployeesPage() {
-    const employeeClient = new EmployeeClient()
+    const employeeClient = EmployeeClient.getInstance()
     const fetchData = async (filters: FilterEmployeeCriteria): Promise<Employee[]> => {
         try {
             const data = await employeeClient.fetchData("employees/filter", filters)
@@ -139,18 +139,22 @@ function EmployeesPage() {
                 </select>
             ) : employee.gender}</td>
             <td>{editingEmployeeIndex === index ? (
-                <DatePicker selected={editedEmployee?.dateOfBirth}
-                            onChange={(date: Date) => setEditedEmployee({
-                                ...editedEmployee!,
-                                dateOfBirth: date.toISOString()
-                            })}/>
+                <DatePicker
+                    name={"dateOfBirth"}
+                    value={editedEmployee?.dateOfBirth}
+                    onChange={(date: string) => setEditedEmployee({
+                        ...editedEmployee!,
+                        dateOfBirth: formatDate(new Date(date))
+                    })}/>
             ) : employee.dateOfBirth}</td>
             <td>{editingEmployeeIndex === index ? (
-                <DatePicker selected={editedEmployee?.dateOfEmployment}
-                            onChange={(date: Date) => setEditedEmployee({
-                                ...editedEmployee!,
-                                dateOfEmployment: date.toISOString()
-                            })}/>
+                <DatePicker
+                    name={"dateOfEmployment"}
+                    value={editedEmployee?.dateOfEmployment}
+                    onChange={(date: string) => setEditedEmployee({
+                        ...editedEmployee!,
+                        dateOfEmployment: formatDate(new Date(date))
+                    })}/>
             ) : employee.dateOfEmployment}</td>
             <td>{editingEmployeeIndex === index ? (
                 <input type="number" value={editedEmployee?.salary || 0}
@@ -183,6 +187,7 @@ function EmployeesPage() {
 
     return (
         <div>
+            <h1>Работники театра</h1>
             <FilteredTable<Employee, FilterEmployeeCriteria>
                 fetchData={fetchData}
                 renderRow={renderRow}
@@ -195,6 +200,16 @@ function EmployeesPage() {
                     gender: '',
                     amountOfChildren: undefined,
                     employeeTypeName: '',
+                    goneOnTour: undefined,
+                    cameOnTour: undefined,
+                    tourStartDate: undefined,
+                    tourEndDate: undefined,
+                    tourPlayId: undefined,
+                    performanceId: undefined,
+                    yearsOfService: undefined,
+                    yearOfBirth: undefined,
+                    age: undefined,
+                    haveChildren: undefined
                 }}
             />
             <button onClick={() => setShowAddForm(true)}>Add New Employee</button>
@@ -226,19 +241,25 @@ function EmployeesPage() {
                     </label>
                     <label>
                         Дата рождения:
-                        <DatePicker selected={newEmployee.dateOfBirth}
-                                    onChange={(date: Date) => setNewEmployee({
-                                        ...newEmployee,
-                                        dateOfBirth: date.toISOString()
-                                    })}/>
+                        <DatePicker
+                            allowClear={true}
+                            name={"dateOfBirth"}
+                            value={newEmployee.dateOfBirth}
+                            onChange={(date: string) => setNewEmployee({
+                                ...newEmployee,
+                                dateOfBirth: formatDate(new Date(date))
+                            })}/>
                     </label>
                     <label>
                         Дата приёма на работу:
-                        <DatePicker selected={newEmployee.dateOfEmployment}
-                                    onChange={(date: Date) => setNewEmployee({
-                                        ...newEmployee,
-                                        dateOfEmployment: date.toISOString()
-                                    })}/>
+                        <DatePicker
+                            allowClear={true}
+                            name={"dateOfEmployment"}
+                            value={newEmployee.dateOfEmployment}
+                            onChange={(date: string) => setNewEmployee({
+                                ...newEmployee,
+                                dateOfEmployment: formatDate(new Date(date))
+                            })}/>
                     </label>
                     <label>
                         Зарплата:
@@ -257,6 +278,11 @@ function EmployeesPage() {
                     <button onClick={() => setShowAddForm(false)}>Cancel</button>
                 </div>
             )}
+            <hr/>
+            <label>
+                <b>Количество:</b> {employees.length}.
+            </label>
+
         </div>
     )
 }

@@ -16,8 +16,8 @@ export class RepertoireClient extends BaseClient<Repertoire, FilterRepertoireCri
         return RepertoireClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterRepertoireCriteria): string {
-        return "";
+    override constructFilterQueryPart(): string | null {
+        return null;
     }
 
     async getAllRepertoires(): Promise<Repertoire[] | undefined> {

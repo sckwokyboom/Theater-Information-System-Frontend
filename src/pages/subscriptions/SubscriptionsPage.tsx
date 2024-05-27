@@ -1,6 +1,5 @@
 import '../../App.css'
 import React, {useEffect, useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
 import {BuySubscriptionRequestClient} from "../../webclients/subscription/BuySubscriptionRequestClient.ts";
 import {PerformanceClient} from "../../webclients/performance/PerformanceClient.ts";
 import {Performance} from '../../webclients/performance/Performance.ts'
@@ -24,7 +23,7 @@ function SubscriptionsPage() {
     const [editingSubscriptionIndex, setEditingSubscriptionIndex] = useState<number | null>(null);
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
 
-    const fetchData = async (_: FilterSubscriptionCriteria): Promise<Subscription[]> => {
+    const fetchData = async (): Promise<Subscription[]> => {
         try {
             const data = await SubscriptionClient.getInstance().getAllSubscriptions()
             if (data) {
@@ -116,7 +115,7 @@ function SubscriptionsPage() {
         console.log(request)
         BuySubscriptionRequestClient.getInstance()
             .buySubscription(request)
-            .then(_ => fetchData({}))
+            .then(() => fetchData())
         setPurchasedTickets([])
     };
 
@@ -138,7 +137,7 @@ function SubscriptionsPage() {
     return (
         <div>
             <label>
-                Уже купленные абонементы
+                <h1>Уже купленные абонементы</h1>
                 <FilteredTable<Subscription, FilterSubscriptionCriteria>
                     fetchData={fetchData}
                     renderRow={renderRow}
@@ -148,6 +147,8 @@ function SubscriptionsPage() {
                     filterInitialState={{}}
                 />
             </label>
+            <hr/>
+            <h1>Покупка абонемента</h1>
             <div style={{display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
                 {purchasedTickets.map((item, index) => (
                     <div key={index} style={{marginBottom: '10px'}}>

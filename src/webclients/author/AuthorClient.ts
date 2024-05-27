@@ -36,6 +36,9 @@ export class AuthorClient extends BaseClient<Author, FilterAuthorCriteria> {
         if (filterParams.dateOfEndPerformanceAuthorsPlays) {
             queryParams.push(`dateOfEndPerformanceAuthorsPlays=${filterParams.dateOfEndPerformanceAuthorsPlays}`);
         }
+        if (filterParams.performanceId) {
+            queryParams.push(`performanceId=${filterParams.performanceId}`);
+        }
         return queryParams.join('&');
     }
 
@@ -46,7 +49,8 @@ export class AuthorClient extends BaseClient<Author, FilterAuthorCriteria> {
                 countryOfOriginId: undefined,
                 genreId: undefined,
                 dateOfStartPerformanceAuthorsPlays: undefined,
-                dateOfEndPerformanceAuthorsPlays: undefined
+                dateOfEndPerformanceAuthorsPlays: undefined,
+                performanceId: undefined
             }
         )
     }

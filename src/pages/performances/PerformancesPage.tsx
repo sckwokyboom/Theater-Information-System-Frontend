@@ -1,11 +1,12 @@
 import '../../App.css'
 import {Performance} from '../../webclients/performance/Performance.ts'
-import React, {useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import {useState} from "react";
 import {PerformanceClient} from "../../webclients/performance/PerformanceClient.ts";
 import {FilterPerformanceCriteria} from "../../webclients/performance/FilterPerformanceCriteria.ts";
 import FilteredTable from "../FilteredTable.tsx";
 import FilterPerformancesForm from "./FilterPerformancesForm.tsx";
+import {DatePicker} from "antd";
+import {formatDate} from "../../utils/Date.ts";
 
 function PerformancesPage() {
     const performanceClient = PerformanceClient.getInstance()
@@ -28,7 +29,7 @@ function PerformancesPage() {
     }
 
     const toggleEditMode = (index: number) => {
-        // setEditingPerformanceIndex(index);
+        setEditingPerformanceIndex(index);
         // setEditedPerformance({...performances[index]});
     };
 
@@ -73,11 +74,14 @@ function PerformancesPage() {
             <td>{performance.authorFirstName}</td>
             <td>{performance.authorSecondName}</td>
             <td>{editingPerformanceIndex === index ? (
-                <DatePicker selected={editedPerformance?.startTime}
-                            onChange={(date: Date) => setEditedPerformance({
-                                ...editedPerformance!,
-                                endTime: date.toISOString()
-                            })}/>
+                <DatePicker
+                    allowClear={true}
+                    name={"startTime"}
+                    value={editedPerformance?.startTime}
+                    onChange={(date: string) => setEditedPerformance({
+                        ...editedPerformance!,
+                        endTime: formatDate(new Date(date))
+                    })}/>
             ) : performance.startTime}</td>
             <td>{performance.hallTitle}</td>
             <td>{editingPerformanceIndex === index ? (
@@ -126,6 +130,7 @@ function PerformancesPage() {
 
     return (
         <div>
+            <h1>Спектакли</h1>
             <FilteredTable<Performance, FilterPerformanceCriteria>
                 fetchData={fetchData}
                 filterInitialState={{
@@ -144,6 +149,10 @@ function PerformancesPage() {
                 tableHeaders={["ID", "Название пьесы", "Жанр", "Век написания пьесы", "Имя автора", "Фамилия автора", "Дата показа", "Зал", "Возрастная категория", "Базовая стоимость билета", "Премьера"]}
                 tableData={performances}
             />
+            <hr/>
+            <label>
+                <b>Количество:</b> {performances.length}.
+            </label>
         </div>
     )
 }

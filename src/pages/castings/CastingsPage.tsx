@@ -1,6 +1,5 @@
 import '../../App.css'
-import React, {useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import {useState} from "react";
 import FilteredTable from "../FilteredTable.tsx";
 import {CastingClient} from "../../webclients/casting/CastingClient.ts";
 import {FilterCastingCriteria} from "../../webclients/casting/FilterCastingCriteria.ts";
@@ -24,7 +23,7 @@ function CastingsPage() {
     }
     const [castings, setCastings] = useState<Casting[]>([]);
     const [editingCastingIndex, setEditingCastingIndex] = useState<number | null>(null);
-    const [editedCasting, setEditedCasting] = useState<Casting | null>(null);
+    const [, setEditedCasting] = useState<Casting | null>(null);
 
     const toggleEditMode = (index: number) => {
         setEditingCastingIndex(index);
@@ -83,21 +82,28 @@ function CastingsPage() {
 
 
     return (
-        <FilteredTable<Casting, FilterCastingCriteria>
-            fetchData={fetchData}
-            filterInitialState={{
-                actorId: undefined,
-                dateOfStart: undefined,
-                dateOfEnd: undefined,
-                playGenreId: undefined,
-                productionDirectorId: undefined,
-                ageCategory: undefined
-            }}
-            renderRow={renderRow}
-            FilterComponent={FilterCastingsForm}
-            tableHeaders={["ID актёра", "Имя актёра", "Фамилия актёра", "Название пьесы", "Дата спектакля", "ID спектакля", "ID дублёра", "ID роли", "Название роли", "Описание роли"]}
-            tableData={castings}
-        />
+        <div>
+            <h1>Кастинги</h1>
+            <FilteredTable<Casting, FilterCastingCriteria>
+                fetchData={fetchData}
+                renderRow={renderRow}
+                FilterComponent={FilterCastingsForm}
+                tableHeaders={["ID актёра", "Имя актёра", "Фамилия актёра", "Название пьесы", "Дата спектакля", "ID спектакля", "ID дублёра", "ID роли", "Название роли", "Описание роли"]}
+                tableData={castings}
+                filterInitialState={{
+                    actorId: undefined,
+                    dateOfStart: undefined,
+                    dateOfEnd: undefined,
+                    playGenreId: undefined,
+                    productionDirectorId: undefined,
+                    ageCategory: undefined
+                }}
+            />
+            <hr/>
+            <label>
+                <b>Количество:</b> {castings.length}.
+            </label>
+        </div>
     )
 }
 

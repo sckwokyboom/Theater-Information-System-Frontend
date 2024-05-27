@@ -5,8 +5,10 @@ import {FilterCastingCriteria} from "../../webclients/casting/FilterCastingCrite
 import {GenreClient} from "../../webclients/genre/GenreClient.ts";
 import {Genre} from "../../webclients/genre/Genre.ts";
 import {ActorClient} from "../../webclients/actor/ActorClient.ts";
-import {DatePicker} from "antd";
+import {Button, DatePicker, Popover} from "antd";
 import {Actor} from "../../webclients/actor/Actor.ts";
+import {Employee} from "../../webclients/employee/Employee.ts";
+import {EmployeeClient} from "../../webclients/employee/EmployeeClient.ts";
 
 const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterCastingCriteria>({
@@ -18,6 +20,7 @@ const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFil
         ageCategory: undefined
     });
 
+    const [productionDirectors, setProductionDirectors] = useState<Employee[]>([]);
     const [actorsOptions, setActorsOptions] = useState<Actor[]>([])
     const [genresOptions, setGenresOptions] = useState<Genre[]>([])
     const [startDate, setStartDate] = useState<string | undefined | null>();
@@ -55,6 +58,10 @@ const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFil
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (startDate != undefined && endDate != undefined && endDate < startDate) {
+            setError('Выберите корректные даты начала и конца периода.');
+            return;
+        }
         onFilterChange(filters);
         console.log(filters)
     };
@@ -83,9 +90,41 @@ const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFil
                 console.error('There was a problem with the fetch operation:', error);
             }
         };
+        const fetchProductionDirectors = async (): Promise<Employee[]> => {
+            const filters = {
+                minSalary: undefined,
+                maxSalary: undefined,
+                gender: '',
+                amountOfChildren: undefined,
+                employeeTypeName: "ProductionDirector",
+                goneOnTour: undefined,
+                cameOnTour: undefined,
+                tourStartDate: undefined,
+                tourEndDate: undefined,
+                tourPlayId: undefined,
+                performanceId: undefined,
+                yearsOfService: undefined,
+                yearOfBirth: undefined,
+                age: undefined,
+                haveChildren: undefined
+            }
+            try {
+                const data = await EmployeeClient.getInstance().fetchData("employees/filter", filters)
+                if (data) {
+                    setProductionDirectors(data);
+                    return data
+                }
+                return []
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return []
+            }
+        }
 
         fetchGenresOptions().then()
         fetchActorsOptions().then()
+        fetchProductionDirectors().then()
+
     }, []);
 
     return (
@@ -97,6 +136,7 @@ const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFil
                     value={filters.actorId}
                     onChange={handleInputChange}
                     className="form-input">
+                    <option></option>
                     {actorsOptions.map(actor => (
                         <option key={actor.id} value={actor.id}>
                             {actor.firstName} {actor.secondName} {actor.patronymic}
@@ -122,18 +162,20 @@ const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFil
                     allowClear={true}
                     name="dateOfEnd"
                     onChange={handleEndDateChange}
-                    value={startDate}
+                    value={endDate}
                     className="form-input"
                 />
             </label>
+            {error && <Popover content={error}><Button type="primary" danger>Ошибка</Button></Popover>}
 
             <label className="form-label">
                 Жанр:
                 <select
-                    name="genreId"
+                    name="playGenreId"
                     value={filters.playGenreId}
                     onChange={handleInputChange}
                     className="form-input">
+                    <option></option>
                     {genresOptions.map(genre => (
                         <option key={genre.id} value={genre.id}>
                             {genre.title}
@@ -142,14 +184,21 @@ const FilterCastingsForm: React.FC<FilterProps<FilterCastingCriteria>> = ({onFil
                 </select>
             </label>
 
-            {/*<label className="form-label">*/}
-            {/*    Режиссёр-постановщик:*/}
-            {/*    <input type="number"*/}
-            {/*           name="amountOfChildren"*/}
-            {/*           value={filters.amountOfChildren}*/}
-            {/*           onChange={handleInputChange}*/}
-            {/*           className="form-input"/>*/}
-            {/*</label>*/}
+            <label className="form-label">
+                Режиссёр-постановщик:
+                <select
+                    name="productionDirectorId"
+                    value={filters.productionDirectorId}
+                    onChange={handleInputChange}
+                    className="form-input">
+                    <option></option>
+                    {productionDirectors.map(productionDirector => (
+                        <option key={productionDirector.id} value={productionDirector.id}>
+                            {productionDirector.firstName} {productionDirector.secondName} {productionDirector.patronymic} ({productionDirector.dateOfBirth})
+                        </option>
+                    ))}
+                </select>
+            </label>
 
             <label className="form-label">
                 Возрастная категория спектакля:

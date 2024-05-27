@@ -16,7 +16,7 @@ export class NationalityClient extends BaseClient<Nationality, FilterNationality
         return NationalityClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterNationalityCriteria): string | null {
+    override constructFilterQueryPart(): string | null {
         return null
     }
 

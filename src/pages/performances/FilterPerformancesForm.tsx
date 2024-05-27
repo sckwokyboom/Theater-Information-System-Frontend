@@ -12,7 +12,7 @@ import {CountryClient} from "../../webclients/country/CountryClient.ts";
 import {RepertoireClient} from "../../webclients/repertoire/RepertoireClient.ts";
 import {AuthorClient} from "../../webclients/author/AuthorClient.ts";
 
-const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChange}) => {
+const FilterPerformancesForm: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterPerformanceCriteria>({
         repertoireId: undefined,
         isPremiere: undefined,
@@ -185,6 +185,18 @@ const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChang
             </label>
 
             <label className="form-label">
+                Уже сыгран:
+                <select name="isUpcoming"
+                        value={filters.isUpcoming}
+                        onChange={handleInputChange}
+                        className="form-select">
+                    <option></option>
+                    <option value={"false"}>Да</option>
+                    <option value={"true"}>Нет</option>
+                </select>
+            </label>
+
+            <label className="form-label">
                 Жанр:
                 <select
                     name="genreId"
@@ -270,4 +282,4 @@ const Filter: React.FC<FilterProps<FilterPerformanceCriteria>> = ({onFilterChang
     );
 };
 
-export default Filter;
+export default FilterPerformancesForm;

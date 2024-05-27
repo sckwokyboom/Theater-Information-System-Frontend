@@ -16,7 +16,7 @@ export class GenreClient extends BaseClient<Genre, FilterGenreCriteria> {
         return GenreClient.instance;
     }
 
-    override constructFilterQueryPart(_: FilterGenreCriteria): string | null {
+    override constructFilterQueryPart(): string | null {
         return null
     }
 

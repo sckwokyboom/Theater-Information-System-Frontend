@@ -1,5 +1,5 @@
 export interface FilterPlaceCriteria {
-    performanceId: number | undefined;
-    isPremiere: boolean | undefined;
-    isUpcomingPerformances: boolean | undefined;
+    performanceId: number | undefined,
+    isPremiere: string | undefined,
+    isUpcomingPerformances: string | undefined
 }

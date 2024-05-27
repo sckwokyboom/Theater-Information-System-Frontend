@@ -58,9 +58,24 @@ export class PerformanceClient extends BaseClient<Performance, FilterPerformance
             authorId: undefined,
             authorCountryId: undefined,
             centuryOfPlayWriting: undefined,
-            isUpcoming: true
+            isUpcoming: "true"
         }
         return this.fetchData("performances/filter", upcomingFilter)
+    }
+
+    getAllPerformances(): Promise<Performance[] | undefined> {
+        const emptyFilter = {
+            repertoireId: undefined,
+            isPremiere: undefined,
+            genreId: undefined,
+            dateOfStart: undefined,
+            dateOfEnd: undefined,
+            authorId: undefined,
+            authorCountryId: undefined,
+            centuryOfPlayWriting: undefined,
+            isUpcoming: undefined
+        }
+        return this.fetchData("performances/filter", emptyFilter)
     }
 
 }

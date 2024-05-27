@@ -7,6 +7,7 @@ import {Country} from "../../webclients/country/Country.ts";
 import {GenreClient} from "../../webclients/genre/GenreClient.ts";
 import {Genre} from "../../webclients/genre/Genre.ts";
 import {Button, DatePicker, Popover} from "antd";
+import {formatDate} from "../../utils/Date.ts";
 
 const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterAuthorCriteria>({
@@ -15,7 +16,8 @@ const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilte
         countryOfOriginId: undefined,
         genreId: undefined,
         dateOfStartPerformanceAuthorsPlays: undefined,
-        dateOfEndPerformanceAuthorsPlays: undefined
+        dateOfEndPerformanceAuthorsPlays: undefined,
+        performanceId: undefined
     });
     const [countriesOptions, setCountriesOptions] = useState<Country[]>([])
     const [genresOptions, setGenresOptions] = useState<Genre[]>([])
@@ -23,12 +25,6 @@ const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilte
     const [endDate, setEndDate] = useState<string | undefined | null>();
     const [error, setError] = useState<string>('');
 
-    function formatDate(date: Date): string {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
 
     const handleStartDateChange = (date: string | null) => {
         setStartDate(date);
@@ -53,6 +49,10 @@ const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilte
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (startDate != undefined && endDate != undefined && endDate < startDate) {
+            setError('Выберите корректные даты начала и конца периода.');
+            return;
+        }
         onFilterChange(filters);
         console.log(filters)
     };
@@ -105,26 +105,26 @@ const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilte
             </label>
 
 
-            {/*<label className="form-label">*/}
-            {/*    Век, в котором жил автор:*/}
-            {/*    <input type="number"*/}
-            {/*           name="centuryOfLiving"*/}
-            {/*           value={filters.centuryOfLiving}*/}
-            {/*           onChange={handleInputChange}*/}
-            {/*           className="form-input"/>*/}
-            {/*</label>*/}
+            <label className="form-label">
+                Век, в котором жил автор:
+                <input type="number"
+                       name="centuryOfLiving"
+                       value={filters.centuryOfLiving}
+                       onChange={handleInputChange}
+                       className="form-input"/>
+            </label>
 
-            {/*<label className="form-label">*/}
-            {/*    Ставился ли спектакль по пьесам автора:*/}
-            {/*    <select name="wasPerformed"*/}
-            {/*            value={filters.wasPerformed}*/}
-            {/*            onChange={handleInputChange}*/}
-            {/*            className="form-select">*/}
-            {/*        <option value=""></option>*/}
-            {/*        <option value="true">Да</option>*/}
-            {/*        <option value="false">Нет</option>*/}
-            {/*    </select>*/}
-            {/*</label>*/}
+            <label className="form-label">
+                Ставился ли спектакль по пьесам автора:
+                <select name="wasPerformed"
+                        value={filters.wasPerformed}
+                        onChange={handleInputChange}
+                        className="form-select">
+                    <option value=""></option>
+                    <option value="true">Да</option>
+                    <option value="false">Нет</option>
+                </select>
+            </label>
 
             <label className="form-label">
                 Жанр, в котором автор писал пьесы:
@@ -133,6 +133,7 @@ const FilterAuthorsForm: React.FC<FilterProps<FilterAuthorCriteria>> = ({onFilte
                     value={filters.genreId}
                     onChange={handleInputChange}
                     className="form-input">
+                    <option></option>
                     {genresOptions.map(genre => (
                         <option key={genre.id} value={genre.id}>
                             {genre.title}

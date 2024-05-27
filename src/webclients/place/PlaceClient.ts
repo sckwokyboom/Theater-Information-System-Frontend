@@ -39,4 +39,5 @@ export class PlaceClient extends BaseClient<Place, FilterPlaceCriteria> {
         return this.fetchData("places/filter", filter)
     }
 
+
 }

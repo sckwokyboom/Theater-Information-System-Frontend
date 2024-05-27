@@ -1,6 +1,5 @@
 import '../../App.css'
-import React, {useEffect, useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import {useEffect, useState} from "react";
 import {Author} from "../../webclients/author/Author.ts";
 import {AuthorClient} from "../../webclients/author/AuthorClient.ts";
 import {FilterAuthorCriteria} from "../../webclients/author/FilterAuthorCriteria.ts";
@@ -8,11 +7,12 @@ import FilteredTable from "../FilteredTable.tsx";
 import FilterAuthorsForm from "./FilterAuthorsForm.tsx";
 import {Country} from "../../webclients/country/Country.ts";
 import {CountryClient} from "../../webclients/country/CountryClient.ts";
-import {Genre} from "../../webclients/genre/Genre.ts";
+import {DatePicker} from "antd";
+import {formatDate} from "../../utils/Date.ts";
 
 
 function AuthorsPage() {
-    const authorClient = new AuthorClient()
+    const authorClient = AuthorClient.getInstance()
     const fetchData = async (filters: FilterAuthorCriteria): Promise<Author[]> => {
         try {
             const data = await authorClient.fetchData("authors/filter", filters)
@@ -116,19 +116,24 @@ function AuthorsPage() {
 
 
             <td>{editingAuthorIndex === index ? (
-                <DatePicker selected={editedAuthor?.dateOfBirth}
-                            onChange={(date: Date) => setEditedAuthor({
-                                ...editedAuthor!,
-                                dateOfBirth: date.toISOString()
-                            })}/>
+                <DatePicker
+                    allowClear={true}
+                    name={"dateOfBirth"}
+                    value={editedAuthor?.dateOfBirth}
+                    onChange={(date: string) => setEditedAuthor({
+                        ...editedAuthor!,
+                        dateOfBirth: formatDate(new Date(date))
+                    })}/>
             ) : author.dateOfBirth}</td>
 
             <td>{editingAuthorIndex === index ? (
-                <DatePicker selected={editedAuthor?.dateOfDeath}
-                            onChange={(date: Date) => setEditedAuthor({
-                                ...editedAuthor!,
-                                dateOfDeath: date.toISOString()
-                            })}/>
+                <DatePicker
+                    name={"dateOfDeath"}
+                    value={editedAuthor?.dateOfDeath}
+                    onChange={(date: string) => setEditedAuthor({
+                        ...editedAuthor!,
+                        dateOfDeath: formatDate(new Date(date))
+                    })}/>
             ) : author.dateOfDeath}</td>
 
             <td>{editingAuthorIndex === index ? (
@@ -165,21 +170,25 @@ function AuthorsPage() {
     );
 
     return (
-        <FilteredTable<Author, FilterAuthorCriteria>
-            fetchData={fetchData}
-            filterInitialState={{
-                wasPerformed: undefined,
-                centuryOfLiving: undefined,
-                countryOfOriginId: undefined,
-                genreId: undefined,
-                dateOfStartPerformanceAuthorsPlays: undefined,
-                dateOfEndPerformanceAuthorsPlays: undefined
-            }}
-            renderRow={renderRow}
-            FilterComponent={FilterAuthorsForm}
-            tableHeaders={["ID", "Имя", "Фамилия", "Отчество", "Дата рождения", "Дата смерти", "Страна происхождения"]}
-            tableData={authors}
-        />
+        <div>
+            <h1>Авторы</h1>
+            <FilteredTable<Author, FilterAuthorCriteria>
+                fetchData={fetchData}
+                filterInitialState={{
+                    wasPerformed: undefined,
+                    centuryOfLiving: undefined,
+                    countryOfOriginId: undefined,
+                    genreId: undefined,
+                    dateOfStartPerformanceAuthorsPlays: undefined,
+                    dateOfEndPerformanceAuthorsPlays: undefined,
+                    performanceId: undefined
+                }}
+                renderRow={renderRow}
+                FilterComponent={FilterAuthorsForm}
+                tableHeaders={["ID", "Имя", "Фамилия", "Отчество", "Дата рождения", "Дата смерти", "Страна происхождения"]}
+                tableData={authors}
+            />
+        </div>
     )
 }
 

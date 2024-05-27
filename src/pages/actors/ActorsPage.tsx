@@ -1,6 +1,5 @@
 import '../../App.css'
-import React, {useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import {useState} from "react";
 import FilteredTable from "../FilteredTable.tsx";
 import FilterActorsForm from "./FilterActorsForm.tsx";
 import {ActorClient} from "../../webclients/actor/ActorClient.ts";
@@ -24,7 +23,7 @@ function ActorsPage() {
     }
     const [actors, setActors] = useState<Actor[]>([]);
 
-    const renderRow = (actor: Actor, index: number) => (
+    const renderRow = (actor: Actor) => (
         <tr key={actor.id}>
             <td>{actor.id}</td>
             <td>{actor.firstName}</td>
@@ -44,6 +43,7 @@ function ActorsPage() {
 
     return (
         <div>
+            <h1>Актёры</h1>
             <FilteredTable<Actor, FilterActorCriteria>
                 fetchData={fetchData}
                 renderRow={renderRow}
@@ -53,12 +53,9 @@ function ActorsPage() {
                 filterInitialState={{
                     roleWeight: undefined,
                     roleHeight: undefined,
-                    roleEyeColor: undefined,
                     roleSkinColor: undefined,
                     roleHairColor: undefined,
                     roleVoiceType: undefined,
-                    roleGender: undefined,
-                    roleAge: undefined,
                     roleNationalityId: undefined,
                     titleId: undefined,
                     age: undefined,
@@ -67,6 +64,10 @@ function ActorsPage() {
                     dateOfEndForTitle: undefined
                 }}
             />
+            <hr/>
+            <label>
+                <b>Количество:</b> {actors.length}.
+            </label>
         </div>
     )
 }
