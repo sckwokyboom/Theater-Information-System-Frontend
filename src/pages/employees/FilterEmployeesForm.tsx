@@ -1,10 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import '../../Filter.css';
+import {
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    TextField,
+    Typography
+} from '@mui/material';
+import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {FilterProps} from "../../FilterProps.ts";
 import {FilterEmployeeCriteria} from "../../webclients/employee/FilterEmployeeCriteria.ts";
-import {DatePicker} from "antd";
 import {Play} from "../../webclients/play/Play.ts";
 import {PlayClient} from "../../webclients/play/PlayClient.ts";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFnsV3";
+// import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 
 const FilterEmployeesForm: React.FC<FilterProps<FilterEmployeeCriteria>> = ({onFilterChange}) => {
     const [filters, setFilters] = useState<FilterEmployeeCriteria>({
@@ -28,87 +40,103 @@ const FilterEmployeesForm: React.FC<FilterProps<FilterEmployeeCriteria>> = ({onF
     const employeeTypeOptions = ['Все работники', 'Артисты', 'Музыканты', 'Актёры', 'Постановщики', 'Режиссёры-постановщики', 'Дирижёры', 'Художники-постановщики', 'Менеджеры'];
 
     const [selectedEmployeeTypeOption, setSelectedEmployeeTypeOption] = useState('Все работники');
-
-    const [startDate, setStartDate] = useState<string | undefined | null>();
-    const [endDate, setEndDate] = useState<string | undefined | null>();
-    // const [error, setError] = useState<string>('');
-    const [plays, setPlays] = useState<Play[]>([])
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [plays, setPlays] = useState<Play[]>([]);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         onFilterChange(filters);
-        console.log("SUBMIT")
-        console.log(filters)
     };
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = event.target;
         setFilters({...filters, [name]: value});
     };
 
-    function formatDate(date: Date): string {
+    const handleSelectChange = (event: SelectChangeEvent<string>) => {
+        const {name, value} = event.target;
+        setFilters({...filters, [name]: value});
+    };
+
+    const handleSelectEmployeeTypeChange = (event: SelectChangeEvent<string>) => {
+        const {value} = event.target;
+        setSelectedEmployeeTypeOption(value);
+        let translatedValue: string;
+
+        switch (value) {
+            case 'Все работники':
+                translatedValue = "Any";
+                break;
+            case 'Артисты':
+                translatedValue = "Artist";
+                break;
+            case 'Музыканты':
+                translatedValue = "Musician";
+                break;
+            case 'Актёры':
+                translatedValue = "Actor";
+                break;
+            case 'Постановщики':
+                translatedValue = "Director";
+                break;
+            case 'Режиссёры-постановщики':
+                translatedValue = "ProductionDirector";
+                break;
+            case 'Дирижёры':
+                translatedValue = "StageConductor";
+                break;
+            case 'Художники-постановщики':
+                translatedValue = "ProductionDesigner";
+                break;
+            case 'Менеджеры':
+                translatedValue = "Manager";
+                break;
+            default:
+                translatedValue = "Any";
+                break;
+        }
+
+        setFilters({...filters, employeeTypeName: translatedValue});
+    };
+
+    const formatDate = (date: Date | null): string | undefined => {
+        if (!date) return undefined;
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
-    }
+    };
 
-    const handleStartDateChange = (date: string | null) => {
+    const handleStartDateChange = (date: Date | null) => {
         setStartDate(date);
         setFilters({
             ...filters,
-            tourStartDate: date ? formatDate(new Date(date)) : undefined
+            tourStartDate: formatDate(date)
         });
     };
 
-    const handleEndDateChange = (date: string | null) => {
+    const handleEndDateChange = (date: Date | null) => {
         setEndDate(date);
         setFilters({
             ...filters,
-            tourEndDate: date ? formatDate(new Date(date)) : undefined
+            tourEndDate: formatDate(date)
         });
     };
 
-    const handleSelectEmployeeTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const {name, value} = event.target;
-        setSelectedEmployeeTypeOption(value)
-        switch (value) {
-            case 'Все работники':
-                setFilters({...filters, [name]: "Any"});
-                break
-            case 'Артисты':
-                setFilters({...filters, [name]: "Artist"});
-                break
-            case 'Музыканты':
-                setFilters({...filters, [name]: "Musician"});
-                break
-            case 'Актёры':
-                setFilters({...filters, [name]: "Actor"});
-                break
-            case 'Постановщики':
-                setFilters({...filters, [name]: "Director"});
-                break
-            case 'Режиссёры-постановщики':
-                setFilters({...filters, [name]: "ProductionDirector"});
-                break
-            case 'Дирижёры':
-                setFilters({...filters, [name]: "StageConductor"});
-                break
-            case 'Художники-постановщики':
-                setFilters({...filters, [name]: "ProductionDesigner"});
-                break
-            case 'Менеджеры':
-                setFilters({...filters, [name]: "Manager"});
-                break
-            default:
-                setFilters({...filters, [name]: "Any"});
-                break
-        }
-    };
+    // const handleSelectEmployeeTypeChange = (event: SelectChangeEvent<string>) => {
+    //     const {value} = event.target;
+    //     setSelectedEmployeeTypeOption(value);
+    //     setFilters({
+    //         ...filters,
+    //         employeeTypeName: value === 'Все работники' ? 'Any' : value
+    //     });
+    // };
 
     useEffect(() => {
         const fetchPlaysOptions = async () => {
             try {
-                const plays = await PlayClient.getInstance().getAllPlays()
+                const plays = await PlayClient.getInstance().getAllPlays();
                 if (plays) {
                     setPlays(plays);
                 }
@@ -117,169 +145,175 @@ const FilterEmployeesForm: React.FC<FilterProps<FilterEmployeeCriteria>> = ({onF
             }
         };
 
-        fetchPlaysOptions().then()
+        fetchPlaysOptions().then();
     }, []);
 
     return (
-        <form onSubmit={handleSubmit} className="filter-form">
-            <label className="form-label">
-                Минимальная зарплата:
-                <input type="number"
-                       name="minSalary"
-                       value={filters.minSalary}
-                       onChange={handleInputChange}
-                       className="form-input"/>
-            </label>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <Box component="form" onSubmit={handleSubmit} sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                <Typography variant="h6">Фильтры сотрудников</Typography>
 
-            <label className="form-label">
-                Максимальная зарплата:
-                <input type="number"
-                       name="maxSalary"
-                       value={filters.maxSalary}
-                       onChange={handleInputChange}
-                       className="form-input"/>
-            </label>
+                <TextField
+                    label="Минимальная зарплата"
+                    type="number"
+                    name="minSalary"
+                    value={filters.minSalary == undefined ? '' : filters.minSalary}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
 
-            <label className="form-label">
-                Пол:
-                <select name="gender"
+                <TextField
+                    label="Максимальная зарплата"
+                    type="number"
+                    name="maxSalary"
+                    value={filters.maxSalary == undefined ? '' : filters.maxSalary}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
+
+                <FormControl fullWidth>
+                    <InputLabel>Пол</InputLabel>
+                    <Select
+                        name="gender"
                         value={filters.gender}
+                        onChange={handleSelectChange}
+                    >
+                        <MenuItem value="">Любой</MenuItem>
+                        <MenuItem value="Male">Мужской</MenuItem>
+                        <MenuItem value="Female">Женский</MenuItem>
+                        <MenuItem value="Other">Другое</MenuItem>
+                    </Select>
+                </FormControl>
+
+                <FormControl fullWidth>
+                    <InputLabel>Есть ли дети</InputLabel>
+                    <Select
+                        name="haveChildren"
+                        value={filters.haveChildren?.toString() == undefined ? '' : filters.haveChildren?.toString()}
+                        onChange={handleSelectChange}
+                    >
+                        <MenuItem value=""></MenuItem>
+                        <MenuItem value="true">Да</MenuItem>
+                        <MenuItem value="false">Нет</MenuItem>
+                    </Select>
+                </FormControl>
+
+                {filters.haveChildren !== false && (
+                    <TextField
+                        label="Количество детей"
+                        type="number"
+                        name="amountOfChildren"
+                        value={filters.amountOfChildren == undefined ? '' : filters.amountOfChildren}
                         onChange={handleInputChange}
-                        className="form-select">
-                    <option value="">Любой</option>
-                    <option value="Male">Мужской</option>
-                    <option value="Female">Женский</option>
-                    <option value="Other">Другое</option>
-                </select>
-            </label>
+                        fullWidth
+                    />
+                )}
 
-            <label className="form-label">
-                Есть ли дети:
-                <select name="haveChildren"
-                        value={filters.haveChildren}
-                        onChange={handleInputChange}
-                        className="form-select">
-                    <option></option>
-                    <option value={"true"}>Да</option>
-                    <option value={"false"}>Нет</option>
-                </select>
-            </label>
+                <TextField
+                    label="Количество лет службы"
+                    type="number"
+                    name="yearsOfService"
+                    value={filters.yearsOfService == undefined ? '' : filters.yearsOfService}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
 
-            {filters.haveChildren != "false" &&
-                <label className="form-label">
-                    Количество детей:
-                    <input type="number"
-                           name="amountOfChildren"
-                           value={filters.amountOfChildren}
-                           onChange={handleInputChange}
-                           className="form-input"/>
-                </label>}
+                <TextField
+                    label="Год рождения"
+                    type="number"
+                    name="yearOfBirth"
+                    value={filters.yearOfBirth == undefined ? '' : filters.yearOfBirth}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
 
-            <label className="form-label">
-                Количество лет службы:
-                <input type="number"
-                       name="yearsOfService"
-                       value={filters.yearsOfService}
-                       onChange={handleInputChange}
-                       className="form-input"/>
-            </label>
+                <TextField
+                    label="Возраст"
+                    type="number"
+                    name="age"
+                    value={filters.age == undefined ? '' : filters.age}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
 
-            <label className="form-label">
-                Год рождения:
-                <input type="number"
-                       name="yearOfBirth"
-                       value={filters.yearOfBirth}
-                       onChange={handleInputChange}
-                       className="form-input"/>
-            </label>
-
-            <label className="form-label">
-                Возраст:
-                <input type="number"
-                       name="age"
-                       value={filters.age}
-                       onChange={handleInputChange}
-                       className="form-input"/>
-            </label>
-
-            <label className="form-label">
-                Тип сотрудника:
-                <select name="employeeTypeName" value={selectedEmployeeTypeOption}
+                <FormControl fullWidth>
+                    <InputLabel>Тип сотрудника</InputLabel>
+                    <Select
+                        name="employeeTypeName"
+                        value={selectedEmployeeTypeOption}
                         onChange={handleSelectEmployeeTypeChange}
-                        className="form-select">
-                    {employeeTypeOptions.map((option, index) => (
-                        <option key={index} value={option}>{option}</option>
-                    ))}
-                </select>
-            </label>
-
-            {!(['Все работники', 'Менеджеры'].includes(selectedEmployeeTypeOption)) && <div>
-                <label className="form-label">
-                    Приезжал на гастроли:
-                    <select name="cameOnTour"
-                            value={filters.cameOnTour}
-                            onChange={handleInputChange}
-                            className="form-select">
-                        <option></option>
-                        <option value={"true"}>Да</option>
-                        <option value={"false"}>Нет</option>
-                    </select>
-                </label>
-
-                <label className="form-label">
-                    Уезжал на гастроли:
-                    <select name="goneOnTour"
-                            value={filters.goneOnTour}
-                            onChange={handleInputChange}
-                            className="form-select">
-                        <option></option>
-                        <option value={"true"}>Да</option>
-                        <option value={"false"}>Нет</option>
-                    </select>
-                </label>
-
-                <label className="form-label">
-                    Гастрольный тур начался:
-                    <DatePicker
-                        allowClear={true}
-                        name="tourStartDate"
-                        onChange={handleStartDateChange}
-                        value={startDate}
-                        className="form-input"
-                    />
-                </label>
-
-                <label className="form-label">
-                    Гастрольный тур закончился:
-                    <DatePicker
-                        allowClear={true}
-                        name="tourEndDate"
-                        onChange={handleEndDateChange}
-                        value={endDate}
-                        className="form-input"
-                    />
-                </label>
-
-                <label className="form-label">
-                    Гастрольный тур с пьесой:
-                    <select
-                        name="tourPlayId"
-                        value={filters.tourPlayId}
-                        onChange={handleInputChange}
-                        className="form-input">
-                        <option></option>
-                        {plays.map(title => (
-                            <option key={title.id} value={title.id}>
-                                {title.title}
-                            </option>
+                    >
+                        {employeeTypeOptions.map((option, index) => (
+                            <MenuItem key={index} value={option}>{option}</MenuItem>
                         ))}
-                    </select>
-                </label>
-            </div>}
+                    </Select>
+                </FormControl>
 
+                {selectedEmployeeTypeOption !== 'Все работники' && selectedEmployeeTypeOption !== 'Менеджеры' && (
+                    <>
+                        <FormControl fullWidth>
+                            <InputLabel>Приезжал на гастроли</InputLabel>
+                            <Select
+                                name="cameOnTour"
+                                value={filters.cameOnTour?.toString() == undefined ? '' : filters.cameOnTour?.toString()}
+                                onChange={handleSelectChange}
+                            >
+                                <MenuItem value=""></MenuItem>
+                                <MenuItem value="true">Да</MenuItem>
+                                <MenuItem value="false">Нет</MenuItem>
+                            </Select>
+                        </FormControl>
 
-            <button type="submit" className="form-button">Применить фильтр</button>
-        </form>
+                        <FormControl fullWidth>
+                            <InputLabel>Уезжал на гастроли</InputLabel>
+                            <Select
+                                name="goneOnTour"
+                                value={filters.goneOnTour?.toString() == undefined ? '' : filters.goneOnTour?.toString()}
+                                onChange={handleSelectChange}
+                            >
+                                <MenuItem value=""></MenuItem>
+                                <MenuItem value="true">Да</MenuItem>
+                                <MenuItem value="false">Нет</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        <DatePicker
+                            label="Гастрольный тур начался"
+                            value={startDate}
+                            onChange={(newValue) => handleStartDateChange(newValue)}
+                            // renderInput={(params: JSX.IntrinsicAttributes & { variant?: TextFieldVariants | undefined; } & Omit<FilledTextFieldProps | OutlinedTextFieldProps | StandardTextFieldProps, "variant">) => <TextField {...params} fullWidth/>}
+                        />
+
+                        <DatePicker
+                            label="Гастрольный тур закончился"
+                            value={endDate}
+                            onChange={handleEndDateChange}
+                            // renderInput={(params) => <TextField {...params} fullWidth />}
+                        />
+
+                        <FormControl fullWidth>
+                            <InputLabel>Гастрольный тур с пьесой</InputLabel>
+                            <Select
+                                name="tourPlayId"
+                                value={filters.tourPlayId?.toString() == undefined ? '' : filters.tourPlayId?.toString()}
+                                onChange={handleSelectChange}
+                            >
+                                <MenuItem value=""></MenuItem>
+                                {plays.map((play) => (
+                                    <MenuItem key={play.id} value={play.id}>
+                                        {play.title}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </>
+                )}
+
+                <Button type="submit" variant="contained">
+                    Применить фильтр
+                </Button>
+            </Box>
+        </LocalizationProvider>
     );
 };
 

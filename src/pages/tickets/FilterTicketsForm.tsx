@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, DatePicker, Popover} from 'antd';
-import '../../Filter.css';
+import '../../styles/Filter.css';
 import {FilterProps} from "../../FilterProps.ts";
 import {FilterTicketCriteria} from "../../webclients/ticket/FilterTicketCriteria.ts";
 import {Performance} from "../../webclients/performance/Performance.ts";

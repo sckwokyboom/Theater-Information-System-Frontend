@@ -1,4 +1,4 @@
-import '../../App.css'
+import '../../styles/App.css'
 import {useEffect, useState} from "react";
 import {Author} from "../../webclients/author/Author.ts";
 import {AuthorClient} from "../../webclients/author/AuthorClient.ts";

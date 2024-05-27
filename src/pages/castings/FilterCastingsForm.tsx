@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import '../../Filter.css';
+import '../../styles/Filter.css';
 import {FilterProps} from "../../FilterProps.ts";
 import {FilterCastingCriteria} from "../../webclients/casting/FilterCastingCriteria.ts";
 import {GenreClient} from "../../webclients/genre/GenreClient.ts";

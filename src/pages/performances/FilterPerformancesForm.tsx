@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, DatePicker, Popover} from 'antd';
-import '../../Filter.css';
+import '../../styles/Filter.css';
 import {Repertoire} from "../../webclients/repertoire/Repertoire.ts";
 import {Genre} from "../../webclients/genre/Genre.ts";
 import {Author} from "../../webclients/author/Author.ts";

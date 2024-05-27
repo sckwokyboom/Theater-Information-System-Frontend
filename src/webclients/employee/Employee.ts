@@ -6,8 +6,8 @@ export class Employee {
     dateOfBirth: string;
     dateOfEmployment: string;
     gender: string;
-    amountOfChildren: number;
-    salary: number;
+    amountOfChildren: number | undefined;
+    salary: number | undefined;
 
     constructor(id: number, firstName: string, secondName: string, patronymic: string, gender: string, dateOfBirth: string, dateOfEmployment: string, salary: number, amountOfChildren: number) {
         this.id = id;

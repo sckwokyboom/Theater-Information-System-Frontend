@@ -1,4 +1,4 @@
-import '../../App.css'
+import '../../styles/App.css'
 import {useState} from "react";
 import FilteredTable from "../FilteredTable.tsx";
 import {RoleClient} from "../../webclients/role/RoleClient.ts";

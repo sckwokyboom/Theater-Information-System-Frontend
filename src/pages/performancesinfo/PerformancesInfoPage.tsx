@@ -1,4 +1,4 @@
-import '../../App.css'
+import '../../styles/App.css'
 import {useEffect, useState} from "react";
 import {Employee} from "../../webclients/employee/Employee.ts";
 import {EmployeeClient} from "../../webclients/employee/EmployeeClient.ts";

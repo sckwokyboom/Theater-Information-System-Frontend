@@ -4,7 +4,7 @@
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #3b3b3b;
 }
 
 .form-label {
@@ -24,12 +24,9 @@
 }
 
 .form-input .ant-picker-input input {
-    /*color: #000; !* черный цвет текста *!*/
-    /*background-color: #000; !* черный цвет текста *!*/
     border-color: #000;
     color-scheme: dark;
 }
-
 
 .form-select {
     width: 100%;
@@ -46,12 +43,12 @@
     padding: 10px;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
+    /*background-color: #007bff;*/
     color: #fff;
     font-size: 16px;
     cursor: pointer;
 }
 
-.form-button:hover {
-    background-color: #0056b3;
-}
+/*.form-button:hover {*/
+/*    background-color: #0056b3;*/
+/*}*/

@@ -1,4 +1,4 @@
-import '../../App.css'
+import '../../styles/App.css'
 import React, {useEffect, useState} from "react";
 import FilteredTable from "../FilteredTable.tsx";
 import {TicketClient} from "../../webclients/ticket/TicketClient.ts";

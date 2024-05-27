@@ -1,4 +1,4 @@
-import '../../App.css'
+import '../../styles/App.css'
 import React, {useEffect, useState} from "react";
 import {BuySubscriptionRequestClient} from "../../webclients/subscription/BuySubscriptionRequestClient.ts";
 import {PerformanceClient} from "../../webclients/performance/PerformanceClient.ts";

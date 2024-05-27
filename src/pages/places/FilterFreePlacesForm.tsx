@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import '../../Filter.css';
+import '../../styles/Filter.css';
 import {FilterProps} from "../../FilterProps.ts";
 import {FilterPlaceCriteria} from "../../webclients/place/FilterPlaceCriteria.ts";
 import {Performance} from "../../webclients/performance/Performance.ts";

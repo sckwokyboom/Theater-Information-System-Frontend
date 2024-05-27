@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 
 interface FilteredTableProps<DataType, FilterCriteria> {
     fetchData: (filters: FilterCriteria) => Promise<DataType[]>;
@@ -36,27 +37,29 @@ const FilteredTable = <DataType, FilterCriteria>({
     }, [filters]);
 
     return (
-        <div className="filtered-table-container">
-            {FilterComponent && <FilterComponent
-                onFilterChange={handleFilterChange}
-            />}
-            <div className="table-container">
-                <table className="table">
-                    <thead className="thead-dark">
-                    <tr>
-                        {tableHeaders.map((header, index) => (
-                            <th key={index}>{header}</th>
+        <Box id="root" sx={{maxWidth: 1280, margin: '0 auto', padding: '2rem', textAlign: 'center'}}>
+            {FilterComponent && (
+                <Box sx={{mb: 2}}>
+                    <FilterComponent onFilterChange={handleFilterChange}/>
+                </Box>
+            )}
+            <TableContainer component={Paper} className="table-container">
+                <Table className="table">
+                    <TableHead>
+                        <TableRow>
+                            {tableHeaders.map((header, index) => (
+                                <TableCell key={index}>{header}</TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {tableData.map((item, index) => (
+                            renderRow(item, index)
                         ))}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {tableData.map((item, index) => (
-                        renderRow(item, index)
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
     );
 };
 

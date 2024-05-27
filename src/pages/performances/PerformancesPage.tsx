@@ -1,4 +1,4 @@
-import '../../App.css'
+import '../../styles/App.css'
 import {Performance} from '../../webclients/performance/Performance.ts'
 import {useState} from "react";
 import {PerformanceClient} from "../../webclients/performance/PerformanceClient.ts";
