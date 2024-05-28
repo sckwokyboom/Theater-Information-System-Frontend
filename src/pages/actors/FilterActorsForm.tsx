@@ -40,7 +40,7 @@ const FilterActorsForm: React.FC<FilterProps<FilterActorCriteria>> = ({onFilterC
         const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             if (startDate != undefined && endDate != undefined && endDate < startDate) {
-                setError('Выберите корректные даты начала и конца периода.');
+                // setError('Выберите корректные даты начала и конца периода.');
                 return;
             }
             onFilterChange(filters);
@@ -57,7 +57,7 @@ const FilterActorsForm: React.FC<FilterProps<FilterActorCriteria>> = ({onFilterC
         const [selectedSkinColorOption, setSelectedSkinColorOption] = useState('');
 
 
-        const [error, setError] = useState<string>('');
+        // const [setError] = useState<string>('');
         const [startDate, setStartDate] = useState<string | undefined | null>();
         const [endDate, setEndDate] = useState<string | undefined | null>();
 
